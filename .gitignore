@@ -1,0 +1,20 @@
+# Android and local build output
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Personal configuration and diagnostic data
+config.local.*
+logs/
+captures/
+*.log
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
