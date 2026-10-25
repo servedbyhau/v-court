@@ -17,11 +17,11 @@ Last updated: 2026-10-25. Read with [context](CONTEXT.md) and
 
 | Part | Branch | Status | Evidence and limit |
 |---|---|---|---|
-| F0 — Establish V Court as the main development repo | `docs/vcourt-foundation` from `main` (`729defd`) | In progress at handoff; verify actual Git state before marking done. | Docs only. No source imported or booking behavior proven. |
+| F0 — Establish V Court as the main development repo | `docs/vcourt-foundation` from `main` (`729defd`) | Complete locally at `4fe5014`; not pushed. | README, plan, AGENTS and context/handoff docs committed. Local links and staged diff checks passed. No source imported or booking behavior proven. |
 
 ## Next gate
 
-After F0 is reviewed, follow [NEXT_SESSION.md](NEXT_SESSION.md) to bring in
-the driver core and implement a safe Android session on separate branches.
+Follow [NEXT_SESSION.md](NEXT_SESSION.md) to bring in the driver core and
+implement a safe Android session on separate branches.
 MuMu must be online for live validation. Record the branch and commit of
 each completed part here; a plan or build alone does not complete a milestone.

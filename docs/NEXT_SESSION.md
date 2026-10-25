@@ -1,6 +1,7 @@
 # V Court next-session plan
 
-Prepared: 2026-10-25. Read [context](CONTEXT.md), [progress](PROGRESS.md) and
+Updated after local foundation commit `4fe5014` on 2026-10-25. Read
+[context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 This plan authorizes no real booking or public push.
 
@@ -14,8 +15,8 @@ behavior as references. Import only needed mobile files after review.
 
 | Part | Branch and base | Deliverable | Exit check |
 |---|---|---|---|
-| F0 — Documentation foundation | `docs/vcourt-foundation` from `main` (`729defd`) | Make this repo canonical; update README/plan and add AGENTS, context, workflow and handoff files. | Only reviewed docs changed; links and `git diff --check` pass. |
-| F1 — Driver core and build | `feat/vcourt-driver-core` from accepted F0 | Import Java instrumentation driver, manifest, needed license/build files and reproducible APK build. | Clean checkout builds driver; no desktop backend or private artifact included. |
+| F0 — Documentation foundation | `docs/vcourt-foundation` from `main` (`729defd`) | Completed locally at `4fe5014`; no push. | Reviewed docs only; links and staged diff checks passed. |
+| F1 — Driver core and build | `feat/vcourt-driver-core` from the accepted `docs/vcourt-foundation` HEAD | Import Java instrumentation driver, manifest, needed license/build files and reproducible APK build. | Clean checkout builds driver; no desktop backend or private artifact included. |
 | F2 — Safe protocol client | `feat/vcourt-driver-client` from accepted F1 | Implement Android command IDs, reply matching, timeout/EOF/invalid-reply handling and broken-session state. | Fake-transport tests and APK build pass. |
 | F3 — Owned Shizuku session | `feat/vcourt-driver-session` from accepted F2 | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped. |
 | F4 — MuMu proof | `test/vcourt-mumu-session` from accepted F3 | Run hello, Vinhomes UI read, safe V Court test tap and cleanup from Android app. | Redacted evidence shows success with no host booking commands; no booking submitted. |
@@ -25,7 +26,7 @@ grows too large, split it into new named branches here before coding.
 
 ## First actions after foundation
 
-1. Verify F0's Git branch, diff and commit. Close its progress entry.
+1. Verify F0's branch and commit `4fe5014`; check for user changes before F1.
 2. Review driver source, manifest, build script and licenses in the sibling
    lab. Compare protocol expectations with desktop `DriverClient` and tests.
 3. Create F1's branch from accepted F0 and import driver core only. Add the
