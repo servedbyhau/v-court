@@ -1,7 +1,9 @@
 # V Court Android technology stack
 
-Decision recorded 2026-10-29 from the completed compatibility lab's
-`docs/mobile/TECH_STACK.md`. This is the chosen foundation for V Court. The
+Decisions recorded 2026-10-29 from the completed compatibility lab assessment.
+These adopted choices are preserved here. The lab implementation and build
+scripts are available at the pinned Git commit in
+[DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md). The
 **implemented** part in this repository is currently the driver and a minimal
 native app shell with reproducible builds; the driver session and booking engine
 are next slices.

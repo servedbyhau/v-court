@@ -2,7 +2,7 @@
 
 Updated: 2026-10-29. Current development uses **MuMu only**. Physical-phone
 validation follows later. Work happens in this `v-court` repository, with
-sibling desktop and lab folders as references. See [context](CONTEXT.md),
+the desktop checkout and archived lab Git source as references. See [context](CONTEXT.md),
 [progress](PROGRESS.md), [next-session plan](NEXT_SESSION.md) and
 [workflow](WORKFLOW.md). [The migration roadmap](ROADMAP.md) orders the
 desktop-to-Android work.
