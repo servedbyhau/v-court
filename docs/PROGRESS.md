@@ -36,10 +36,11 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
 | F1 — Android build and AI context | `chore/vcourt-android-foundation` from `docs/vcourt-foundation` (`a46633b`) | Complete at `d76bba9`; branch pushed. | Python 3.14.4, JDK 21.0.10 and SDK/Build Tools 35.0.0 passed `check_env.py`. Both APK builds and signature verification passed locally; app min SDK 33, driver min SDK 30, both target 35. Python scripts compiled; staged diff checks passed. CI workflow added; its GitHub result was not checked in this record. No MuMu device was attached, so no live session or booking is claimed. |
 | R1 — Desktop-to-Android migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete at `2b47979`; branch pushed. | Local and remote desktop `develop` matched at `50ed350`; reviewed current desktop roadmap, architecture, flow and driver tests. Source map, ordered slices, one-APK proof and validation gates recorded. Documentation diff check passed; no Android implementation or device test in this slice. |
 | B1 — `develop` integration workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Merged into `develop` at `0c72e67`; included in `main` through PR #1. | Branch topology and future bases recorded; documentation diff check passed. Old task branch removed. |
-| C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Local checks passed; GitHub CI pending. | Initial CI run `40921421762` failed before compilation: setup-android requested unavailable package `tools`. Explicit SDK packages configured and lab references moved to verified Git objects. Environment check, both APK builds/signature verification and diff check passed on 2026-10-30. No device test. |
+| C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Fix at `68de4bb`; [PR #2](https://github.com/servedbyhau/v-court/pull/2) into `develop` awaits merge. | [GitHub CI passed](https://github.com/servedbyhau/v-court/actions/runs/40929071381): SDK setup, environment check and both APK builds. Local builds/signature verification, lab source-file checks, Markdown links and diff checks passed. Replaced unavailable SDK package `tools` and missing lab folders with verified Git references. No device test. |
 
 ## Next gate
 
-Follow [NEXT_SESSION.md](NEXT_SESSION.md) for the safe protocol client, early
+After PR #2 is merged into `develop`, follow [NEXT_SESSION.md](NEXT_SESSION.md)
+for the safe protocol client, early
 one-APK proof and owned Shizuku session on separate branches. MuMu must be
 online for the packaging and live session gates. A build does not complete M1.

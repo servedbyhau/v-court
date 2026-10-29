@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated for CI and source-reference repair on 2026-10-30. Read
+Updated after C1 fix `68de4bb` and successful GitHub CI on 2026-10-30. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -21,7 +21,7 @@ Python is build-time tooling only. V Court feature branches start from its own
 | F1 — Android development foundation | `chore/vcourt-android-foundation` from `docs/vcourt-foundation` (`a46633b`) | Completed at `d76bba9`; included in `develop` and `main`; old task branch removed. | Both APKs built locally. Initial GitHub CI failed in SDK setup; C1 addresses it. |
 | R1 — Migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete at `2b47979`; included in `develop` and `main`; old task branch removed. | Desktop source mapped to ordered Android slices and one-APK gate; docs checked. |
 | B1 — `develop` workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Merged into `develop` at `0c72e67`, then into `main` through PR #1; old task branch removed. | Branch topology recorded; subsequent work branches target `develop`. |
-| C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Replace setup-android's obsolete default `tools` package with explicit SDK packages; replace missing lab-folder references with pinned Git source; refresh merged-branch handoff. | Local environment and both APK builds pass; GitHub CI passes on a PR into `develop`; lab reference files can be read with `git show`; no product runtime change. |
+| C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Fix at `68de4bb`; [PR #2](https://github.com/servedbyhau/v-court/pull/2) awaits merge into `develop`. | GitHub CI and both local APK builds passed; lab references and Markdown links verified. No product runtime change. |
 | F2 — Safe protocol client | `feat/vcourt-driver-client` from current `develop` after C1 | Add a repeatable Java fake-test command; implement Android command IDs, reply matching, timeout/EOF/invalid-reply handling and broken-session state. | Fake-transport tests run locally and in CI; APK build passes; merge into `develop`. |
 | F2a — One-APK architecture proof | `spike/vcourt-one-apk` from `develop` after F2 | Prove one installable V Court APK containing app and Instrumentation driver on MuMu, with Shizuku startup, hello, safe read/tap and cleanup. | Fresh single-APK install and redacted device evidence pass; merge into `develop`. |
 | F3 — Owned Shizuku session | `feat/vcourt-driver-session` from `develop` after F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped; merge into `develop`. |
@@ -32,7 +32,8 @@ grows too large, split it into new named branches here before coding.
 
 ## First actions after C1
 
-1. Refresh the desktop `develop` reference as described in
+1. Merge the checked C1 PR into V Court's `develop` before branching F2.
+   Refresh the desktop `develop` reference as described in
    [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md). Read its `driver.py` and
    `tests/test_driver.py` before F2; the lab's `ShellBridge` is only a transport
    reference, available from its archived Git commit rather than a folder.
