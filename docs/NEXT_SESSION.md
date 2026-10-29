@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated for the mobile migration roadmap on 2026-10-29. Read
+Updated after R1 commit `2b47979` on 2026-10-29. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 This plan authorizes no real booking or public push.
@@ -18,7 +18,7 @@ Python is build-time tooling only.
 |---|---|---|---|
 | F0 — Documentation foundation | `docs/vcourt-foundation` from `main` (`729defd`) | Completed locally at `4fe5014`; no push. | Reviewed docs only; links and staged diff checks passed. |
 | F1 — Android development foundation | `chore/vcourt-android-foundation` from `docs/vcourt-foundation` (`a46633b`) | Completed locally at `d76bba9`; no push. | Both APKs built locally; CI defined but not run; no device attached. |
-| R1 — Migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Map current desktop behavior and tests to Android slices, record one-APK distribution and validation gates, update AI handoff. | Roadmap has dependencies and exit evidence; related docs agree; no product claim or real booking. |
+| R1 — Migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete locally at `2b47979`; no push. | Desktop source mapped to ordered Android slices and one-APK gate; docs checked. |
 | F2 — Safe protocol client | `feat/vcourt-driver-client` from accepted R1 | Implement Android command IDs, reply matching, timeout/EOF/invalid-reply handling and broken-session state. | Fake-transport tests and APK build pass. |
 | F2a — One-APK architecture proof | `spike/vcourt-one-apk` from accepted F2 | Prove one installable V Court APK containing app and Instrumentation driver on MuMu, with Shizuku startup, hello, safe read/tap and cleanup. | Fresh single-APK install and redacted device evidence pass; no host booking commands. |
 | F3 — Owned Shizuku session | `feat/vcourt-driver-session` from accepted F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped. |
