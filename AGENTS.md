@@ -1,10 +1,23 @@
-# Codex guidance for V Court
+# AI development guidance for V Court
 
-This repository, `D:\VH-Booker\mobile\v-court`, is the **main development repository**.
-The sibling `vh-tennis-booker-android` folder is a mobile experiment inside the
-original desktop repository; `vh-tennis-booker` is the desktop product. Read
-[context](docs/CONTEXT.md), [progress](docs/PROGRESS.md) and
-[next-session plan](docs/NEXT_SESSION.md) at the start of project work.
+This repository, `D:\VH-Booker\mobile\v-court`, is the **main Android development
+repository**. At the start of every session, read [context](docs/CONTEXT.md),
+[progress](docs/PROGRESS.md), [next-session plan](docs/NEXT_SESSION.md),
+[technology stack](docs/TECH_STACK.md) and [desktop source map](docs/DESKTOP_REFERENCE.md).
+Use [setup](docs/SETUP.md) for build and device prerequisites.
+
+## Current desktop reference is mandatory
+
+- Always consult `D:\VH-Booker\vh-tennis-booker` before translating booking
+  behavior, labels, settings or tests. Its `develop` branch is the source of
+  truth, and changes after any dated snapshot in V Court docs take precedence.
+- Compare local `develop` with remote `refs/heads/develop` before relying on it.
+  Fetch the remote branch when it is newer, then inspect `origin/develop` with
+  `git show`; do not switch or edit the desktop working tree. If network access
+  prevents verification, state the local commit and the freshness limit.
+- Read the desktop `AGENTS.md` and `CLAUDE.md` plus the files relevant to the
+  slice. The lab at `D:\VH-Booker\mobile\vh-tennis-booker-android` is a
+  read-only compatibility reference, never the behavioral source of truth.
 
 ## Planning and branches
 
@@ -20,8 +33,9 @@ original desktop repository; `vh-tennis-booker` is the desktop product. Read
 - Current development and validation use **MuMu only**. The eventual product runs
   on an Android phone without PC control; physical-phone tests are a later phase.
 - Keep the Java instrumentation driver core and protocol as the starting point.
-  Build the Android booking engine, UI, scheduling and local data here. Refer to
-  sibling sources and current desktop tests when porting behavior.
+  Build the Android booking engine, UI, scheduling and local data here. The
+  native Java/Shizuku/SDK-tools stack is recorded in [TECH_STACK.md](docs/TECH_STACK.md).
+  Refer to current desktop tests when porting behavior.
 - Import only reviewed files needed for a mobile slice. Do not bulk-copy Python,
   FastAPI, React, Windows scheduling code, desktop history or private artifacts.
 - A real booking is successful only after the target app shows its ticket.
@@ -37,5 +51,7 @@ original desktop repository; `vh-tennis-booker` is the desktop product. Read
 - Keep each implementation slice buildable. Use fake-driver tests for booking
   decisions and MuMu for the current device gate. Emulator evidence does not
   prove physical-phone compatibility.
+- Run `tools/check_env.py` and the affected build/tests. Never commit build
+  outputs, debug keys, accounts, UI dumps or real booking records.
 - Documentation and code use English; app labels may use the target app's
   language. [The plan](docs/PLAN.md) owns milestones.

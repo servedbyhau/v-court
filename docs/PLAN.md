@@ -1,6 +1,6 @@
 # V Court project plan
 
-Updated: 2026-10-25. Current development uses **MuMu only**. Physical-phone
+Updated: 2026-10-29. Current development uses **MuMu only**. Physical-phone
 validation follows later. Work happens in this `v-court` repository, with
 sibling desktop and lab folders as references. See [context](CONTEXT.md),
 [progress](PROGRESS.md), [next-session plan](NEXT_SESSION.md) and
@@ -31,6 +31,8 @@ or a linked task plan.
 ## Source decisions
 
 - Retain and adapt the Java UiAutomation instrumentation driver and protocol.
+- Use native Android Java, Android Views, Shizuku API 13.1.5 and the pinned
+  SDK-tools builds for the first product slices. See [TECH_STACK.md](TECH_STACK.md).
 - Translate desktop screen recognition, bilingual labels, retries, venue and
   calendar behavior, ticket verification and uncertain outcomes into Android.
   Check the latest desktop tests before porting.
@@ -41,5 +43,6 @@ or a linked task plan.
 
 ## Open decisions
 
-Product application ID, app/driver signing and update method, Android UI toolkit,
-minimum supported version and exact scheduling design.
+Release signing and update method, minimum supported phone version after device
+testing, and exact scheduling design. The development app ID is
+`dev.vcourt.mobile`; the driver keeps `dev.courtbooker.driver`.

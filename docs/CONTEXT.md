@@ -1,6 +1,6 @@
 # V Court project context
 
-Last reviewed: 2026-10-25. Verify Git and source state at each new session.
+Last reviewed: 2026-10-29. Verify Git and source state at each new session.
 
 ## Decisions
 
@@ -8,8 +8,17 @@ Last reviewed: 2026-10-25. Verify Git and source state at each new session.
   `vh-tennis-booker-android` is a mobile experiment in the original desktop
   repository; `vh-tennis-booker` remains the desktop product. Treat both
   sibling folders as read-only references unless the user asks otherwise.
+- Always consult the latest desktop `develop` at
+  `D:\VH-Booker\vh-tennis-booker` when porting behavior. Check the remote
+  branch first; [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) maps the current
+  source and tests. The 2026-10-29 local and remote heads were both `50ed350`
+  (release 0.18.0), but that observation must be refreshed.
 - Develop and test on MuMu for the current phase. The eventual product runs
   completely on an Android phone without a PC; physical tests are deferred.
+- Use the completed lab's [Java/Shizuku/UiAutomation stack](TECH_STACK.md) as
+  the Android foundation. Native Java Views and SDK-tools builds are chosen
+  for this phase; app identity is `dev.vcourt.mobile`, while the proven driver
+  identity remains `dev.courtbooker.driver` for protocol compatibility.
 - Retain and adapt the Java instrumentation driver core. Implement Android
   booking, scheduling, UI, settings, history and notifications as V Court code.
   The old Python, FastAPI, React and Windows task code is reference only.
@@ -33,10 +42,13 @@ navigation changed after the lab branch.
 
 ## Current repo state
 
-Before this handoff, `v-court` contained README, LICENSE, .gitignore and
-`docs/PLAN.md`, with no Android source. The next code slice imports only the
-reviewed driver core and builds a safe Android driver session. See
-[progress](PROGRESS.md) and [next-session plan](NEXT_SESSION.md).
+The Android foundation branch imports the current desktop driver source and
+adds a minimal V Court app shell. Both APKs build from source with SDK 35 and
+JDK 21 on the development machine. The app only shows Shizuku readiness and
+requests permission: no driver session, booking engine or scheduler is present.
+See [progress](PROGRESS.md) and [next-session plan](NEXT_SESSION.md) for the
+verified state and next code slice.
 
-Open decisions: Android application ID, signing/update path, UI toolkit,
-minimum Android version and exact scheduling approach.
+Open decisions: release signing/update path, exact scheduling approach and
+physical-phone minimum version after testing. The development keys stay in
+ignored build directories.
