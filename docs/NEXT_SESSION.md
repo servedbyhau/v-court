@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated for the `develop` integration branch on 2026-10-29. Read
+Updated after B1 workflow commit `7899f3d` on 2026-10-29. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -20,7 +20,7 @@ Python is build-time tooling only. V Court feature branches start from its own
 | F0 — Documentation foundation | `docs/vcourt-foundation` from `main` (`729defd`) | Completed at `4fe5014`; branch pushed. | Reviewed docs only; links and staged diff checks passed. |
 | F1 — Android development foundation | `chore/vcourt-android-foundation` from `docs/vcourt-foundation` (`a46633b`) | Completed at `d76bba9`; branch pushed. | Both APKs built locally; CI defined but not run; no device attached. |
 | R1 — Migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete at `2b47979`; branch pushed. | Desktop source mapped to ordered Android slices and one-APK gate; docs checked. |
-| B1 — `develop` workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Record branch topology, update AI guidance and merge this docs slice into `develop`. | GitHub has `develop`; docs agree on branch bases and merge path; no change to `main`. |
+| B1 — `develop` workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Workflow change committed at `7899f3d`; merge this docs branch into `develop`. | GitHub has `develop`; docs agree on branch bases and merge path; no change to `main`. |
 | F2 — Safe protocol client | `feat/vcourt-driver-client` from current `develop` after B1 | Implement Android command IDs, reply matching, timeout/EOF/invalid-reply handling and broken-session state. | Fake-transport tests and APK build pass; merge into `develop`. |
 | F2a — One-APK architecture proof | `spike/vcourt-one-apk` from `develop` after F2 | Prove one installable V Court APK containing app and Instrumentation driver on MuMu, with Shizuku startup, hello, safe read/tap and cleanup. | Fresh single-APK install and redacted device evidence pass; merge into `develop`. |
 | F3 — Owned Shizuku session | `feat/vcourt-driver-session` from `develop` after F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped; merge into `develop`. |
