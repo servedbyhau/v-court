@@ -43,9 +43,10 @@ MuMu, Vinhomes Resident, Shizuku in non-root shell mode and the separate
 driver APK are needed for live tests. `adb` is optional for the build and is
 not on `PATH` in the checked shell; MuMu provides it under
 `C:\Program Files\Netease\MuMuPlayer\nx_main\adb.exe`. Use the intended
-MuMu instance explicitly. The compatibility lab's
-`android/mobile/README.md` documents its setup and observations, but the lab
-probe is not V Court's product app.
+MuMu instance explicitly. The archived compatibility lab's
+`android/mobile/README.md` documents its setup and observations. Read it
+from desktop Git using [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md); the lab
+worktree folder has been removed. The probe is not V Court's product app.
 
 Do not run a real booking without explicit authorization. A successful build
 does not establish an Android-controlled session or booking. The next gate is
@@ -54,7 +55,12 @@ taps only its own safe target and cleans up. See [NEXT_SESSION.md](NEXT_SESSION.
 
 ## Continuous integration
 
-`.github/workflows/android-driver.yml` installs the pinned SDK packages,
+`.github/workflows/android-driver.yml` explicitly installs `platform-tools`,
+`platforms;android-35` and `build-tools;35.0.0` through setup-android,
 checks the toolchain and builds both APKs from source. CI does not upload
 or commit APKs, install them on a device or prove the MuMu gate. Run the same
 local commands after changes to the driver, app or build scripts.
+
+The first GitHub run failed before compilation because setup-android's default
+package list requested the unavailable legacy `tools` package. Keep the
+explicit package list rather than falling back to that default.

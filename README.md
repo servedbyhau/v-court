@@ -5,8 +5,8 @@ phone run will not depend on a Windows PC, emulator or desktop service.
 
 **Current phase:** develop and validate the Android app on MuMu. Physical-phone
 testing follows after the emulator implementation works. This repository is the
-main development home; the sibling `vh-tennis-booker-android` folder is a
-compatibility lab of the original desktop project, not this app's source tree.
+main development home. The original compatibility lab is preserved in the
+desktop repository's Git history; its old worktree folder has been removed.
 
 The completed lab demonstrated an Android-controlled driver read and tap on
 MuMu. A separate real booking during that research was controlled by Python

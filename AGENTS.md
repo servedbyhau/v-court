@@ -17,8 +17,11 @@ Use [setup](docs/SETUP.md) for build and device prerequisites and
   `git show`; do not switch or edit the desktop working tree. If network access
   prevents verification, state the local commit and the freshness limit.
 - Read the desktop `AGENTS.md` and `CLAUDE.md` plus the files relevant to the
-  slice. The lab at `D:\VH-Booker\mobile\vh-tennis-booker-android` is a
-  read-only compatibility reference, never the behavioral source of truth.
+  slice. The lab worktree has been removed; its reviewed source remains in
+  desktop Git at commit `b85a70e1bc582020d7bea4dbe65175c18fdbf24a`
+  (`feat/android-on-device`). Read it with `git show <commit>:<path>` as
+  documented in [DESKTOP_REFERENCE.md](docs/DESKTOP_REFERENCE.md). Use it as
+  compatibility evidence; current desktop `develop` owns booking behavior.
 
 ## Planning and branches
 

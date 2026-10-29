@@ -1,13 +1,13 @@
 # Current desktop reference for Android work
 
 Always read the latest `develop` source at `D:\VH-Booker\vh-tennis-booker`
-before translating behavior into V Court. Do not use the old Python tree in
-`vh-tennis-booker-android` as the specification. The desktop checkout is a
+before translating behavior into V Court. Do not use the archived Android
+lab's older Python tree as the specification. The desktop checkout is a
 read-only reference for V Court work; its daily runner and schedule are separate.
 
 ## Freshness check
 
-At the 2026-10-29 review, local `develop` and GitHub `develop` both pointed to
+At the 2026-10-30 review, local `develop` and GitHub `develop` both pointed to
 `50ed350e8585c4f4316ad8162f5df525bf0a2354` (desktop release 0.18.0).
 That is a dated observation, not a pinned requirement. At each new session:
 
@@ -23,6 +23,31 @@ reference without switching the desktop working tree. If the remote cannot be
 checked, report the local commit and the freshness limit. Before modifying a
 slice, read desktop `AGENTS.md`, its referenced `CLAUDE.md`, the current
 `CHANGELOG.md`, and relevant files below.
+
+## Archived compatibility lab
+
+The old `vh-tennis-booker-android` worktree folder no longer exists. Its
+reviewed source is still available in the desktop repository at commit
+`b85a70e1bc582020d7bea4dbe65175c18fdbf24a`, retained by local branch
+`feat/android-on-device`. Use the commit to inspect the experiment without
+switching or changing the live desktop checkout:
+
+```powershell
+git -C D:\VH-Booker\vh-tennis-booker show b85a70e1bc582020d7bea4dbe65175c18fdbf24a:android/mobile/README.md
+git -C D:\VH-Booker\vh-tennis-booker show b85a70e1bc582020d7bea4dbe65175c18fdbf24a:android/mobile/src/main/java/dev/courtbooker/mobile/ShellBridge.java
+```
+
+At that same commit, `tools/build_mobile.py` and `tools/build_driver.py` record
+the lab's build versions and dependency hashes. The files
+`android/mobile/src/main/java/dev/courtbooker/mobile/ProbeService.java` and
+`MainActivity.java` show the probe lifecycle and safe tap target. The original
+lab stack document is not present in that commit; V Court's adopted choices
+are preserved in [TECH_STACK.md](TECH_STACK.md). Read current desktop `develop`
+for protocol client and booking behavior. The lab branch was local-only when
+checked on 2026-10-30; it was not listed on desktop `origin`. A fresh clone
+needs that reviewed commit transferred from the existing local repository
+before these commands work. Do not assume it can be fetched from GitHub or
+substitute an unverified copy when the commit is unavailable.
 
 ## Source map
 
