@@ -39,10 +39,11 @@ phone requirements without a separate product decision.
 
 ## Ordered slices
 
-Each row is one reviewable branch from the accepted preceding slice. Put the
-concrete branch/base/exit check into [NEXT_SESSION.md](NEXT_SESSION.md) before
-implementation. Keep the two APK development build working until the one-APK
-proof replaces it; do not delay the proof until release.
+Each row is one reviewable branch from V Court's current `develop`, after the
+preceding slice has merged there. Put the concrete branch/base/exit check into
+[NEXT_SESSION.md](NEXT_SESSION.md) before implementation. Keep the two APK
+development build working until the one-APK proof replaces it; do not delay
+the proof until release.
 
 | Slice | Deliverable | Exit evidence |
 |---|---|---|
