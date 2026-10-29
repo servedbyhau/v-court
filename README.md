@@ -20,6 +20,10 @@ V Court APK. Python in `tools/` runs only on the build machine; Shizuku remains
 a separate installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
 for the ordered conversion from the desktop behavior.
 
+Development happens on short-lived branches from `develop`; validated work
+merges back into `develop`, and a stable milestone is promoted to `main`.
+See [the branch workflow](docs/WORKFLOW.md).
+
 **Desktop reference:** always check the latest `develop` at
 `D:\VH-Booker\vh-tennis-booker` before porting behavior. The lab's inherited
 Python tree is older. See [desktop source map](docs/DESKTOP_REFERENCE.md).

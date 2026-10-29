@@ -24,8 +24,10 @@ Use [setup](docs/SETUP.md) for build and device prerequisites and
 
 - State the outcome, small steps and validation before project work. Record the
   actionable plan in `docs/NEXT_SESSION.md` or a linked task plan before edits.
-- Follow [workflow](docs/WORKFLOW.md): one reviewable part per named branch, with
-  base, deliverable and exit check recorded. Preserve work before switching.
+- Follow [workflow](docs/WORKFLOW.md): branch each reviewable part from V
+  Court's `develop`, record its base, deliverable and exit check, then merge
+  it into `develop` after validation. Promote stable `develop` to `main` after
+  review. Preserve work before switching branches.
 - Update progress after each part and the next-session plan before ending work.
   Record actual evidence and limitations, not only intentions.
 

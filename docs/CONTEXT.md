@@ -8,6 +8,9 @@ Last reviewed: 2026-10-29. Verify Git and source state at each new session.
   `vh-tennis-booker-android` is a mobile experiment in the original desktop
   repository; `vh-tennis-booker` remains the desktop product. Treat both
   sibling folders as read-only references unless the user asks otherwise.
+- V Court's `develop` is the integration branch. New task branches start there
+  and merge back after validation; stable `develop` work is promoted to
+  `main`. This branch is separate from the desktop's `develop` reference.
 - Always consult the latest desktop `develop` at
   `D:\VH-Booker\vh-tennis-booker` when porting behavior. Check the remote
   branch first; [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) maps the current
