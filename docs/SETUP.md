@@ -6,6 +6,10 @@ or Linux with Python 3.9+, JDK 17+, Android SDK platform 35 and Build Tools
 build needs four pinned Shizuku AARs. Neither build installs an APK or runs a
 booking.
 
+Python here is host-side build tooling. It is not packaged into an APK or
+needed to run V Court on Android. The current two APK outputs are a development
+scaffold; [the roadmap](ROADMAP.md) requires a one-APK architecture proof.
+
 ## Local setup on the current Windows machine
 
 The checked installation on 2026-10-29 was Python 3.14.4, JDK 21.0.10,

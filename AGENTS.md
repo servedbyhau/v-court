@@ -4,7 +4,8 @@ This repository, `D:\VH-Booker\mobile\v-court`, is the **main Android developmen
 repository**. At the start of every session, read [context](docs/CONTEXT.md),
 [progress](docs/PROGRESS.md), [next-session plan](docs/NEXT_SESSION.md),
 [technology stack](docs/TECH_STACK.md) and [desktop source map](docs/DESKTOP_REFERENCE.md).
-Use [setup](docs/SETUP.md) for build and device prerequisites.
+Use [setup](docs/SETUP.md) for build and device prerequisites and
+[the migration roadmap](docs/ROADMAP.md) for slice order.
 
 ## Current desktop reference is mandatory
 
@@ -36,6 +37,10 @@ Use [setup](docs/SETUP.md) for build and device prerequisites.
   Build the Android booking engine, UI, scheduling and local data here. The
   native Java/Shizuku/SDK-tools stack is recorded in [TECH_STACK.md](docs/TECH_STACK.md).
   Refer to current desktop tests when porting behavior.
+- The release target is one V Court APK. Python under `tools/` is build-time
+  host tooling only, not an APK runtime. The current two-APK layout is
+  temporary; prove combined app/Instrumentation packaging on MuMu before
+  fixing the product Shizuku session design.
 - Import only reviewed files needed for a mobile slice. Do not bulk-copy Python,
   FastAPI, React, Windows scheduling code, desktop history or private artifacts.
 - A real booking is successful only after the target app shows its ticket.

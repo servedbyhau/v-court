@@ -17,8 +17,13 @@ Last reviewed: 2026-10-29. Verify Git and source state at each new session.
   completely on an Android phone without a PC; physical tests are deferred.
 - Use the completed lab's [Java/Shizuku/UiAutomation stack](TECH_STACK.md) as
   the Android foundation. Native Java Views and SDK-tools builds are chosen
-  for this phase; app identity is `dev.vcourt.mobile`, while the proven driver
-  identity remains `dev.courtbooker.driver` for protocol compatibility.
+  for this phase; app identity is `dev.vcourt.mobile`. The development driver
+  currently uses `dev.courtbooker.driver`; one-APK packaging may change its
+  package identity while preserving the protocol behavior.
+- The release must be one V Court APK with no Python runtime. The two current
+  APKs are a temporary build scaffold. Prove combined app/Instrumentation
+  packaging on MuMu before fixing the product session design. Shizuku remains
+  separately installed under the chosen stack.
 - Retain and adapt the Java instrumentation driver core. Implement Android
   booking, scheduling, UI, settings, history and notifications as V Court code.
   The old Python, FastAPI, React and Windows task code is reference only.

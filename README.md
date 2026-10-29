@@ -15,6 +15,11 @@ minimal native app shell that checks Shizuku readiness. It has no Android
 booking engine or daily scheduler yet. The desktop Python backend and React UI
 are references, not app dependencies.
 
+The current builds produce two development APKs. The release target is one
+V Court APK. Python in `tools/` runs only on the build machine; Shizuku remains
+a separate installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
+for the ordered conversion from the desktop behavior.
+
 **Desktop reference:** always check the latest `develop` at
 `D:\VH-Booker\vh-tennis-booker` before porting behavior. The lab's inherited
 Python tree is older. See [desktop source map](docs/DESKTOP_REFERENCE.md).
