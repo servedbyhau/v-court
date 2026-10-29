@@ -2,6 +2,9 @@
 .gradle/
 build/
 local.properties
+__pycache__/
+*.pyc
+.venv/
 *.apk
 *.aab
 *.keystore

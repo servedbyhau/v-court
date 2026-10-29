@@ -1,35 +1,57 @@
-# Project plan
+# V Court project plan
+
+Updated: 2026-10-29. Current development uses **MuMu only**. Physical-phone
+validation follows later. Work happens in this `v-court` repository, with
+sibling desktop and lab folders as references. See [context](CONTEXT.md),
+[progress](PROGRESS.md), [next-session plan](NEXT_SESSION.md) and
+[workflow](WORKFLOW.md). [The migration roadmap](ROADMAP.md) orders the
+desktop-to-Android work.
 
 ## Goal
 
-An Android app that can complete a scheduled tennis court booking on a physical phone without a computer participating in the run. A computer may still be used to build and debug the app.
-
-## Starting point
-
-The original `vh-tennis-booker` has a working Windows/Python booking flow and a separate Android compatibility lab. The lab demonstrated on-device UI reads and taps on MuMu through Shizuku and an instrumentation driver. It has not run the booking flow on a phone. A real booking made during that research was controlled by Python on the host.
-
-This repository starts with documentation only. Import code selectively after its role, dependencies, and behavior have been reviewed for a phone runtime.
+V Court should book a configured tennis court at the opening time on an Android
+phone without PC control and call it booked only after reading the ticket. It
+should show readiness and distinguish booked, refused and unknown outcomes.
+The release target is one V Court APK, with no Python runtime. Shizuku remains
+a separately installed prerequisite under the chosen stack.
 
 ## Milestones
 
-1. **Design:** settle the Android runtime, permissions, scheduling, local data, and recovery behavior.
-2. **Phone prototype:** read the target app and verify navigation and taps on a physical device without a PC controller.
-3. **Booking flow:** move the necessary state machine and checks to Android; support a dry run and an explicitly initiated real booking.
-4. **Unattended run:** schedule the opening time; verify wake, lock-screen, Doze, interruption, and reboot behavior.
-5. **Release readiness:** review privacy, logging, setup, recovery instructions, and repeatable builds.
+| Milestone | Exit condition |
+|---|---|
+| M0 — Foundation | Repo rules, source boundary, plan, build strategy and first branch-sized work are recorded in `v-court`. |
+| M1 — Driver path | One V Court APK containing app and Instrumentation driver is proven on MuMu; the Android-owned Shizuku session handshakes, reads Vinhomes UI, safely taps its own target and cleans up without PC commands. |
+| M2 — Manual booking | New Android engine uses current desktop behavior as reference. MuMu dry run stops before confirmation; a separately authorized real run reads its ticket. |
+| M3 — Timed run | The Android app warms up and runs at a configured opening on MuMu, with bounded timeouts, one active run and clear failure states. |
+| M4 — Mobile product | Native setup, choices, readiness, run state, history and notifications work on MuMu without FastAPI or a browser. |
+| M5 — Phone validation | Repeat driver, booking, background, locked-screen and interruption tests on a chosen physical phone. Resolve Shizuku and reboot readiness there. |
+| M6 — Release | One signed V Court APK, reviewed source, CI, signing/update path, privacy checks and fresh install/update evidence are available from this repo; Python is absent from the device runtime. |
 
-## Reuse review
+MuMu success is emulator evidence, not phone compatibility. Split each milestone
+into small parts with separate branches in [NEXT_SESSION.md](NEXT_SESSION.md)
+or a linked task plan.
 
-Potentially reusable: screen labels, booking states, date/slot/court checks, ticket verification, error handling, and the Android driver experiment.
+## Source decisions
 
-Do not carry over by default: Windows Task Scheduler, MuMu setup, ADB host control, Python/FastAPI services, the React desktop UI, or old configuration and personal run data.
+- Retain and adapt the Java UiAutomation instrumentation driver and protocol.
+- Treat the current two APKs as a development scaffold. Prove the one-APK
+  layout before fixing the product session design; its package and target
+  arrangement is not yet validated.
+- Use native Android Java, Android Views, Shizuku API 13.1.5 and the pinned
+  SDK-tools builds for the first product slices. See [TECH_STACK.md](TECH_STACK.md).
+- Translate desktop screen recognition, bilingual labels, retries, venue and
+  calendar behavior, ticket verification and uncertain outcomes into Android.
+  Check the latest desktop tests before porting.
+- Build Android UI, engine, scheduling and persistence here. Leave Windows Task
+  Scheduler, host ADB, Python/FastAPI, the Python build scripts and React out
+  of the app runtime.
+- Import source selectively with licenses and tests. Keep personal config,
+  screenshots, UI dumps, logs, keys and generated APKs out of Git.
 
-## Decisions to make before implementation
+## Open decisions
 
-- App identity: display name, repository name, Android application ID, and visual identity.
-- Android stack and minimum supported version.
-- Whether the Shizuku/instrumentation approach is viable on the intended physical phone, including after reboot.
-- How the user configures account, court, slots, and schedule without storing sensitive data unnecessarily.
-- What the app should report when a booking result cannot be confirmed.
-
-The acceptance test for the core goal is a booking initiated, completed, and verified on the phone while no computer is controlling it.
+Release signing and update method, minimum supported phone version after device
+testing, and exact scheduling design. The development app ID is
+`dev.vcourt.mobile`; the development driver currently uses
+`dev.courtbooker.driver`. The final Instrumentation package/target arrangement
+depends on the one-APK proof.
