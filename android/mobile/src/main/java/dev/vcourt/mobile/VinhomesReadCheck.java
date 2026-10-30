@@ -145,7 +145,7 @@ final class VinhomesReadCheck implements Runnable {
      * screen. Nothing inside Vinhomes is tapped.
      */
     private String comeBack(DriverClient client) throws Exception {
-        Intent back = new Intent(context, MainActivity.class)
+        Intent back = new Intent(context, DriverChecksActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         context.startActivity(back);
         if (waitForFront(client, DriverContract.PACKAGE, RETURN_TIMEOUT_MS)) {
