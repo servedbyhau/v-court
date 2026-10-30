@@ -1,7 +1,7 @@
 package dev.vcourt.engine.flow;
 
 /** The device, or the driver behind it, is not usable: the run stops. */
-public final class DeviceException extends CourtBookerException {
+public class DeviceException extends CourtBookerException {
     private static final long serialVersionUID = 1L;
 
     public DeviceException(String message) {
