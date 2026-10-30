@@ -16,11 +16,12 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
   promoted to `main` through PR #5 (`8afc3ef`); `main`'s CI, red since PR #1 from
   the old SDK package list, passed there. Merging PR #5 deleted `develop` (head
   branches are deleted on merge); it was restored at `cc472db` the same minute.
-  S2 merged into `develop` through PR #6 (`3a3baca`). Current work is F2a, the
-  one-APK proof, from `develop` (`3a3baca`), not yet committed.
+  S2 merged into `develop` through PR #6 (`3a3baca`) and F2a's code through
+  PR #7 (`333f2cd`), before its MuMu run. That run is the open gate.
 - This repo has a buildable Java driver, a native Android app shell and, from
-  F2, a plain-Java protocol client with JVM tests. With F2a the app APK also
-  holds the driver and can run the one-APK proof; it is not yet run on a device.
+  F2, a plain-Java protocol client with JVM tests. Since F2a the app APK also
+  holds the driver and can run the one-APK proof; CI builds it, but it has not
+  run on a device.
   There is no reusable driver session, booking engine, daily scheduler or
   history yet.
 - Current development target: MuMu emulator. Physical-phone validation is later.
@@ -49,11 +50,11 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
 | F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 | Merged into `develop` through [PR #4](https://github.com/servedbyhau/v-court/pull/4) at `cc472db`. | `DriverClient`, `StreamTransport` and a dependency-free JSON codec in `dev.vcourt.engine.driver`, ported from desktop `driver.py` with its messages and broken-connection rules. `tools/test_java.py` runs 57 JUnit tests on JDK 21 (`--release 11`; engine compiled with `-Xlint:all -Werror`), including a client session over a loopback socket against a stand-in driver; breaking the timeout or id rule fails them. CI ran the tests and built both APKs with the engine inside. No device test. |
 | P1 — Promote `develop` to `main` | `develop` (`cc472db`) into `main` | Merged through [PR #5](https://github.com/servedbyhau/v-court/pull/5) at `8afc3ef`. | `main`'s CI passed for the first time (its only earlier run failed in SDK setup, fixed by C1). The merge deleted `develop`; it was pushed back at `cc472db`. Protect `develop` to prevent a repeat. |
 | S2 — Session context | `docs/vcourt-session-context` from `develop` (`cc472db`) | Merged into `develop` through [PR #6](https://github.com/servedbyhau/v-court/pull/6) at `3a3baca`. | `CLAUDE.md` imports `AGENTS.md`; commit and pull request rules, cloud session limits and a GitHub route to the desktop reference recorded; status notes brought up to date. No code change. |
-| F2a — One-APK proof | `spike/vcourt-one-apk` from `develop` (`3a3baca`) | Implemented in a cloud session, not committed; CI build and the MuMu run are the exit. | The app APK compiles `android/app`'s driver in and declares it as an Instrumentation targeting `dev.vcourt.mobile`. `ShellService`, a Shizuku user service, runs `am instrument -w --no-restart`; the Android 15 framework (Robolectric `android-all` 15) shows that flag keeps the running process instead of force-stopping the package, at start and at finish. `OneApkProof` checks the free socket, starts the driver, runs `hello`, `current`, `dump`, a `click` on V Court's own test target (and that the tap arrived), `stop`, and that `am` ended and the socket closed. Evidence so far: the app and driver compile against that jar with `-Xlint:all` and no warning in this repo's code; the 57 engine tests pass. No APK was built here (no Android SDK) and nothing ran on a device. |
+| F2a — One-APK proof | `claude/modest-einstein-8rwk32` from `develop` (`3a3baca`), a session-generated name instead of `spike/vcourt-one-apk` | Code at `5d44964`, merged into `develop` through [PR #7](https://github.com/servedbyhau/v-court/pull/7) at `333f2cd`; the MuMu run is still open. | The app APK compiles `android/app`'s driver in and declares it as an Instrumentation targeting `dev.vcourt.mobile`. `ShellService`, a Shizuku user service, runs `am instrument -w --no-restart`; the Android 15 framework (Robolectric `android-all` 15) shows that flag keeps the running process instead of force-stopping the package, at start and at finish. `OneApkProof` checks the free socket, starts the driver, runs `hello`, `current`, `dump`, a `click` on V Court's own test target (and that the tap arrived), `stop`, and that `am` ended and the socket closed. Evidence: the app and driver compile against that jar with `-Xlint:all` and no warning in this repo's code; the 57 engine tests pass; [CI on the pull request](https://github.com/servedbyhau/v-court/actions/runs/41018714495) and [on `develop`](https://github.com/servedbyhau/v-court/actions/runs/41018859919) ran the tests and built and signed both APKs, the V Court one with the driver inside. Nothing has run on a device: whether `am` accepts `--no-restart` there is unproven. |
 
 ## Next gate
 
-F2a's device run: build the APK (CI or the development machine), install it on
-MuMu with Shizuku running and follow [SETUP.md](SETUP.md), "One-APK proof".
-Then F3, the owned Shizuku session, per [NEXT_SESSION.md](NEXT_SESSION.md). A
-build does not complete M1.
+F2a's device run: build the APK on the development machine from `develop`,
+install it on MuMu with Shizuku running and follow [SETUP.md](SETUP.md),
+"One-APK proof". Then F3, the owned Shizuku session, per
+[NEXT_SESSION.md](NEXT_SESSION.md). A build does not complete M1.

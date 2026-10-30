@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated after S2 merged (PR #6) and F2a was implemented on 2026-10-30. Read
+Updated after F2a's code merged (PR #7) on 2026-10-30. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -25,7 +25,8 @@ Python is build-time tooling only. V Court feature branches start from its own
 | S1 — Desktop sync | `docs/vcourt-desktop-sync` from `develop` (`f9fe06b`) | Merged through PR #3 at `930fdf4`. | Desktop changes from `50ed350` to `a16240a` recorded. |
 | F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 | Merged through PR #4 at `cc472db`; promoted to `main` through PR #5. | 57 JVM tests and both APK builds pass in CI. |
 | S2 — Session context | `docs/vcourt-session-context` from `develop` (`cc472db`) | Merged through PR #6 at `3a3baca`. | Docs agree; links checked. |
-| F2a — One-APK architecture proof | `spike/vcourt-one-apk` from `develop` (`3a3baca`) | Implemented, not committed: one APK with app and Instrumentation driver; Shizuku shell service starts it with `--no-restart`; the in-app proof runs hello, safe read/tap and cleanup. | CI builds the APK; fresh single-APK install on MuMu and two passing proof reports; merge into `develop`. |
+| F2a — One-APK architecture proof | From `develop` (`3a3baca`); merged through PR #7 at `333f2cd` | One APK with app and Instrumentation driver; Shizuku shell service starts it with `--no-restart`; the in-app proof runs hello, safe read/tap and cleanup. CI builds it. | Open: fresh single-APK install on MuMu and two passing proof reports, recorded on a `docs/` branch. |
+| D1 — F2a status and branch names | `docs/vcourt-f2a-status` from `develop` (`333f2cd`) | Status notes say F2a merged with its MuMu run open; AGENTS.md states the branch naming rule. | Docs agree; links checked; merge into `develop`. |
 | F3 — Owned Shizuku session | `feat/vcourt-driver-session` from `develop` after F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped; merge into `develop`. |
 | F4 — MuMu proof | `test/vcourt-mumu-session` from `develop` after F3 | Run hello, Vinhomes UI read, safe V Court test tap and cleanup from Android app. | Redacted evidence shows success with no host booking commands; merge into `develop`; no booking submitted. |
 
@@ -34,22 +35,22 @@ grows too large, split it into new named branches here before coding.
 
 ## Next: F2a, one-APK architecture proof
 
-Base: `develop` at `3a3baca` (S2 merged through PR #6). Branch name per the table;
-nothing is committed until the user asks.
+The code merged into `develop` through PR #7 (`333f2cd`) before the device run,
+so that run is what remains; its result goes on its own branch from `develop`.
 
-1. Code, done in a cloud session: the driver sources in `android/app` are compiled
+1. Code, done: the driver sources in `android/app` are compiled
    into the V Court APK, which declares them as an Instrumentation targeting
    itself. A Shizuku user service (`ShellService`, shell UID) runs
-   `am instrument -w --no-restart`: Android 13 and later then load the driver
-   into the running V Court process instead of force-stopping the package
-   (checked in the Android 15 framework: `INSTR_FLAG_NO_RESTART`). The app
+   `am instrument -w --no-restart`: Android then loads the driver into the
+   running V Court process instead of force-stopping the package (checked in
+   the Android 15 framework, `INSTR_FLAG_NO_RESTART`; other versions unchecked). The app
    connects a `LocalSocket` to `court-driver`, wraps it in `StreamTransport` and
    runs `hello`, `current`, `dump`, one `click` on V Court's own test target,
    then `stop`, and checks that the driver ended and the socket is gone. The
    lab's `ShellBridge` could not be read in the cloud; this one is new.
-2. Checks in the cloud: engine tests, and a compile of the app and driver against
-   an Android 15 framework jar. CI builds the APK.
-3. Device gate, on the development machine: install the one APK on MuMu with
+2. Checks, done: engine tests and a compile against an Android 15 framework jar
+   in the cloud; CI built and signed the APK on PR #7 and on `develop`.
+3. Device gate, open, on the development machine: install the one APK on MuMu with
    Shizuku running, run the proof twice ([SETUP.md](SETUP.md), "One-APK proof"),
    and record the redacted report in [PROGRESS.md](PROGRESS.md). No booking.
 4. Then record the package and Instrumentation contract in
