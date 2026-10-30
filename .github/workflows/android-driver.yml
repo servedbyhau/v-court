@@ -23,5 +23,6 @@ jobs:
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
       - run: python tools/check_env.py
+      - run: python tools/test_java.py --fetch
       - run: python tools/build_driver.py
       - run: python tools/build_mobile.py --fetch
