@@ -26,6 +26,21 @@ public final class Node {
         return box.height();
     }
 
+    /** Nodes are equal when label, bounds and clickability are: a screen read again equals. */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Node)) {
+            return false;
+        }
+        Node n = (Node) other;
+        return clickable == n.clickable && desc.equals(n.desc) && box.equals(n.box);
+    }
+
+    @Override
+    public int hashCode() {
+        return (desc.hashCode() * 31 + box.hashCode()) * 2 + (clickable ? 1 : 0);
+    }
+
     @Override
     public String toString() {
         return box + (clickable ? " clickable " : " ") + "'" + desc.replace("\n", "\\n") + "'";
