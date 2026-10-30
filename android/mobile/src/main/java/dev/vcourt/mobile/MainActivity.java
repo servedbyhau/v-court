@@ -2,16 +2,30 @@ package dev.vcourt.mobile;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import rikka.shizuku.Shizuku;
 
-/** Minimal native shell for checking Shizuku readiness before the driver session exists. */
+/**
+ * Native shell: shows Shizuku readiness and runs the one-APK proof ({@link OneApkProof})
+ * against a test target on this same screen.
+ */
 public final class MainActivity extends Activity {
     private TextView status;
+    private Button run;
+    private Button target;
+    private TextView report;
+    private final AtomicInteger taps = new AtomicInteger();
+    private final ExecutorService proofs = Executors.newSingleThreadExecutor();
     private final Shizuku.OnRequestPermissionResultListener permissionListener =
             (requestCode, grantResult) -> runOnUiThread(this::showStatus);
 
@@ -42,7 +56,30 @@ public final class MainActivity extends Activity {
             showStatus();
         });
         body.addView(authorize);
-        setContentView(body);
+
+        run = new Button(this);
+        run.setText("Run one-APK proof");
+        run.setOnClickListener(view -> startProof());
+        body.addView(run);
+
+        // The proof finds this button by its content description, as the booking flow finds
+        // the target app's elements, and checks that its tap arrived.
+        target = new Button(this);
+        target.setContentDescription(DriverContract.TEST_TARGET);
+        target.setOnClickListener(view -> showTaps(taps.incrementAndGet()));
+        showTaps(0);
+        body.addView(target);
+
+        report = new TextView(this);
+        report.setTypeface(Typeface.MONOSPACE);
+        report.setTextSize(12);
+        report.setTextIsSelectable(true);
+        report.setPadding(0, 24, 0, 0);
+        body.addView(report);
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(body);
+        setContentView(scroll);
         Shizuku.addRequestPermissionResultListener(permissionListener);
         showStatus();
     }
@@ -56,7 +93,22 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         Shizuku.removeRequestPermissionResultListener(permissionListener);
+        proofs.shutdown();
         super.onDestroy();
+    }
+
+    private void startProof() {
+        run.setEnabled(false);
+        report.setText("");
+        proofs.execute(() -> {
+            new OneApkProof(this, taps::get, line -> runOnUiThread(() -> report.append(line + "\n")))
+                    .run();
+            runOnUiThread(() -> run.setEnabled(true));
+        });
+    }
+
+    private void showTaps(int count) {
+        target.setText("Test target (taps: " + count + ")");
     }
 
     private void showStatus() {
@@ -66,7 +118,7 @@ public final class MainActivity extends Activity {
         } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
             status.setText("Shizuku permission is required.");
         } else {
-            status.setText("Shizuku is ready. Driver session setup is the next step.");
+            status.setText("Shizuku is ready. Run the one-APK proof to start the driver.");
         }
     }
 }

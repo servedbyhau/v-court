@@ -4,7 +4,6 @@
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
-        <package android:name="dev.courtbooker.driver" />
     </queries>
     <application android:label="V Court" android:allowBackup="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
@@ -20,4 +19,10 @@
             android:enabled="true" android:exported="true" android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
+    <!-- The driver, compiled from android/app into this APK. It targets V Court itself and
+         is started by ShellService with am instrument -w no-restart flag, which loads it into
+         the running V Court process instead of force-stopping the package. -->
+    <instrumentation android:name="dev.courtbooker.driver.Driver"
+        android:label="V Court driver"
+        android:targetPackage="dev.vcourt.mobile" />
 </manifest>
