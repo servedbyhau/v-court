@@ -16,12 +16,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import rikka.shizuku.Shizuku;
 
 /**
- * Native shell: shows Shizuku readiness and runs the one-APK proof ({@link OneApkProof})
- * against a test target on this same screen.
+ * Native shell: shows Shizuku readiness and runs the driver checks, the one-APK proof
+ * ({@link OneApkProof}) and the Vinhomes read check ({@link VinhomesReadCheck}), against a
+ * test target on this same screen.
  */
 public final class MainActivity extends Activity {
     private TextView status;
     private Button run;
+    private Button read;
     private Button target;
     private TextView report;
     private final AtomicInteger taps = new AtomicInteger();
@@ -59,8 +61,15 @@ public final class MainActivity extends Activity {
 
         run = new Button(this);
         run.setText("Run one-APK proof");
-        run.setOnClickListener(view -> startProof());
+        run.setOnClickListener(view -> startCheck(
+                new OneApkProof(this, taps::get, this::showReportLine)));
         body.addView(run);
+
+        read = new Button(this);
+        read.setText("Read Vinhomes screen");
+        read.setOnClickListener(view -> startCheck(
+                new VinhomesReadCheck(this, taps::get, this::showReportLine)));
+        body.addView(read);
 
         // The proof finds this button by its content description, as the booking flow finds
         // the target app's elements, and checks that its tap arrived.
@@ -97,14 +106,21 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    private void startProof() {
+    private void startCheck(Runnable check) {
         run.setEnabled(false);
+        read.setEnabled(false);
         report.setText("");
         proofs.execute(() -> {
-            new OneApkProof(this, taps::get, line -> runOnUiThread(() -> report.append(line + "\n")))
-                    .run();
-            runOnUiThread(() -> run.setEnabled(true));
+            check.run();
+            runOnUiThread(() -> {
+                run.setEnabled(true);
+                read.setEnabled(true);
+            });
         });
+    }
+
+    private void showReportLine(String line) {
+        runOnUiThread(() -> report.append(line + "\n"));
     }
 
     private void showTaps(int count) {
@@ -118,7 +134,7 @@ public final class MainActivity extends Activity {
         } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
             status.setText("Shizuku permission is required.");
         } else {
-            status.setText("Shizuku is ready. Run the one-APK proof to start the driver.");
+            status.setText("Shizuku is ready. Run a check to start the driver.");
         }
     }
 }

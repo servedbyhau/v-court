@@ -62,7 +62,13 @@ does not establish an Android-controlled session or booking. The next gate is
 an Android app that owns the Shizuku session, performs `hello`, reads a screen,
 taps only its own safe target and cleans up. See [NEXT_SESSION.md](NEXT_SESSION.md).
 
-## One-APK proof (F2a)
+## Driver checks on MuMu (phase A)
+
+Two checks in V Court make phase A's device evidence: the one-APK proof (F2a) and
+the Vinhomes read check (F4). Both run the driver inside the V Court APK through
+Shizuku and stop it at the end; neither books anything.
+
+### One-APK proof
 
 On MuMu with Shizuku running (adb mode) and nothing else serving `court-driver`
 (stop the separate driver APK's instrumentation if it runs):
@@ -77,9 +83,26 @@ On MuMu with Shizuku running (adb mode) and nothing else serving `court-driver`
    in the same app process (the report shows the app pid).
 
 The report reads only V Court's own screen, so it holds no personal data; copy it
-into [PROGRESS.md](PROGRESS.md). A `FAIL` at `am instrument` shows what `am`
+into [PROGRESS.md](PROGRESS.md). A `FAIL` at the driver's start shows what `am`
 printed; record it as the blocker ([NEXT_SESSION.md](NEXT_SESSION.md) names the
 fallbacks).
+
+### Vinhomes read check
+
+After the proof passes, with Vinhomes Resident installed and signed in on the
+same MuMu instance:
+
+1. Open V Court and tap **Read Vinhomes screen**. V Court starts the driver,
+   opens Vinhomes and reads it until the home screen's "Tiện ích" (or
+   "Utilities") tile shows, for up to 30 s. Nothing in Vinhomes is tapped.
+2. V Court comes back to the front by itself (or by one Back press, which the
+   report names), taps its own test target and stops the driver.
+3. The report ends with `RESULT:`; logcat tag `VCourtVinhomes`.
+
+The report holds only counts, timings and which home label showed, never text
+from the Vinhomes screen, so it can be copied into [PROGRESS.md](PROGRESS.md).
+If Vinhomes shows a sign-in or a notice instead of its home screen, close that by
+hand and run the check again.
 
 ## Cloud sessions
 

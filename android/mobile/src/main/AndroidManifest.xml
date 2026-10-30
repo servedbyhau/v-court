@@ -4,6 +4,8 @@
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
+        <!-- Vinhomes Resident, which the driver reads; Android 11 and later hide it otherwise. -->
+        <package android:name="com.vinhomes.resident" />
     </queries>
     <application android:label="V Court" android:allowBackup="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
