@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".SettingsActivity" android:exported="false"
             android:label="Booking settings" />
+        <activity android:name=".HistoryActivity" android:exported="false"
+            android:label="Run history" />
         <provider android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="dev.vcourt.mobile.shizuku"
             android:enabled="true" android:exported="true" android:multiprocess="false"
