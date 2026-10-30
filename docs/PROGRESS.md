@@ -5,16 +5,19 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
 
 ## Current position
 
-- Main development folder: `D:\VH-Booker\mobile\v-court`; Git remote:
-  `servedbyhau/v-court`. V Court's `develop` was created on GitHub from
+- Main development folder: `D:\VH-Booker\mobile\v-court` (a cloud session uses
+  its own clone); Git remote: `servedbyhau/v-court`. V Court's `develop` was created on GitHub from
   `docs/vcourt-mobile-roadmap` at `6d55713`. Work branches now start from
   `develop` and merge there; stable work is promoted to `main`.
 - Foundation and roadmap reached `main` through merged PR #1 (`557efd5`).
   The four completed task branches were removed after ancestry checks found
-  no unmerged commits. C1 merged into `develop` through PR #2 (`f9fe06b`).
-  Current work is S1, the desktop sync, on `docs/vcourt-desktop-sync` from
-  `develop` (`f9fe06b`), and F2, the protocol client, on
-  `feat/vcourt-driver-client` stacked on S1; merge them in that order.
+  no unmerged commits. C1 merged into `develop` through PR #2 (`f9fe06b`), S1
+  through PR #3 (`930fdf4`) and F2 through PR #4 (`cc472db`). `develop` was
+  promoted to `main` through PR #5 (`8afc3ef`); `main`'s CI, red since PR #1 from
+  the old SDK package list, passed there. Merging PR #5 deleted `develop` (head
+  branches are deleted on merge); it was restored at `cc472db` the same minute.
+  Current work is S2, session context, on `docs/vcourt-session-context` from
+  `develop` (`cc472db`); the next code slice is F2a.
 - This repo now has a buildable Java driver, a minimal native Android app
   shell and, from F2, a plain-Java protocol client with JVM tests. The app
   reports Shizuku readiness and can request permission. It has no owned driver
@@ -41,8 +44,10 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
 | R1 — Desktop-to-Android migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete at `2b47979`; branch pushed. | Local and remote desktop `develop` matched at `50ed350`; reviewed current desktop roadmap, architecture, flow and driver tests. Source map, ordered slices, one-APK proof and validation gates recorded. Documentation diff check passed; no Android implementation or device test in this slice. |
 | B1 — `develop` integration workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Merged into `develop` at `0c72e67`; included in `main` through PR #1. | Branch topology and future bases recorded; documentation diff check passed. Old task branch removed. |
 | C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Fix at `68de4bb`; merged into `develop` through [PR #2](https://github.com/servedbyhau/v-court/pull/2) at `f9fe06b`. | [GitHub CI passed](https://github.com/servedbyhau/v-court/actions/runs/40929071381): SDK setup, environment check and both APK builds. Local builds/signature verification, lab source-file checks, Markdown links and diff checks passed. Replaced unavailable SDK package `tools` and missing lab folders with verified Git references. No device test. |
-| S1 — Desktop sync to 0.18.1 | `docs/vcourt-desktop-sync` from `develop` (`f9fe06b`) | Documentation change; merge into `develop` is the exit. | Desktop GitHub `develop` `a16240a` compared with the `50ed350` baseline: the calendar day-tap fix and the `pick_date` label recorded for slices 4 and 5; driver protocol and sources unchanged (V Court `Driver.java` differs in comments only). No code or device change. |
-| F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 (`40930fc`) | Implemented; merge into `develop` after S1 is the exit. | `DriverClient`, `StreamTransport` and a dependency-free JSON codec in `dev.vcourt.engine.driver`, ported from desktop `driver.py` with its messages and broken-connection rules. `tools/test_java.py` runs 57 JUnit tests on JDK 21 (`--release 11`; engine compiled with `-Xlint:all -Werror`), including a client session over a loopback socket against a stand-in driver; breaking the timeout or id rule fails them. CI runs the tests; the APK builds were not run in this session (no Android SDK), so CI must confirm them. No device test. |
+| S1 — Desktop sync to 0.18.1 | `docs/vcourt-desktop-sync` from `develop` (`f9fe06b`) | Merged into `develop` through [PR #3](https://github.com/servedbyhau/v-court/pull/3) at `930fdf4`. | Desktop GitHub `develop` `a16240a` compared with the `50ed350` baseline: the calendar day-tap fix and the `pick_date` label recorded for slices 4 and 5; driver protocol and sources unchanged (V Court `Driver.java` differs in comments only). No code or device change. |
+| F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 | Merged into `develop` through [PR #4](https://github.com/servedbyhau/v-court/pull/4) at `cc472db`. | `DriverClient`, `StreamTransport` and a dependency-free JSON codec in `dev.vcourt.engine.driver`, ported from desktop `driver.py` with its messages and broken-connection rules. `tools/test_java.py` runs 57 JUnit tests on JDK 21 (`--release 11`; engine compiled with `-Xlint:all -Werror`), including a client session over a loopback socket against a stand-in driver; breaking the timeout or id rule fails them. CI ran the tests and built both APKs with the engine inside. No device test. |
+| P1 — Promote `develop` to `main` | `develop` (`cc472db`) into `main` | Merged through [PR #5](https://github.com/servedbyhau/v-court/pull/5) at `8afc3ef`. | `main`'s CI passed for the first time (its only earlier run failed in SDK setup, fixed by C1). The merge deleted `develop`; it was pushed back at `cc472db`. Protect `develop` to prevent a repeat. |
+| S2 — Session context | `docs/vcourt-session-context` from `develop` (`cc472db`) | Documentation change; merge into `develop` is the exit. | `CLAUDE.md` imports `AGENTS.md`; commit and pull request rules, cloud session limits and a GitHub route to the desktop reference recorded; status notes brought up to date. No code change. |
 
 ## Next gate
 

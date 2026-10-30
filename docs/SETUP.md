@@ -61,6 +61,22 @@ does not establish an Android-controlled session or booking. The next gate is
 an Android app that owns the Shizuku session, performs `hello`, reads a screen,
 taps only its own safe target and cleans up. See [NEXT_SESSION.md](NEXT_SESSION.md).
 
+## Cloud sessions
+
+A cloud session (Claude Code on the web) has a clone of this repository and a
+JDK, but no `D:\` drive, MuMu or device. Checked on 2026-10-30:
+
+- `tools/test_java.py --fetch` works: JUnit comes from Maven Central, which can
+  answer 429 for a while; run it again later. The engine and its tests can be
+  written and verified there.
+- The Android SDK cannot be downloaded (`dl.google.com` is refused), so the APK
+  builds run in CI only: open the pull request and read its `Android builds` run.
+- Pushing branches works once the repository is attached to the session with write
+  access; deleting a branch on GitHub is refused, so the user deletes merged
+  branches.
+- Commit identity and signing: see [AGENTS.md](../AGENTS.md), "Commits and pull
+  requests". The container's global Git config signs commits otherwise.
+
 ## Continuous integration
 
 `.github/workflows/android-driver.yml` explicitly installs `platform-tools`,

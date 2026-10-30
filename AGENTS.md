@@ -1,7 +1,9 @@
 # AI development guidance for V Court
 
-This repository, `D:\VH-Booker\mobile\v-court`, is the **main Android development
-repository**. At the start of every session, read [context](docs/CONTEXT.md),
+This repository, `servedbyhau/v-court` (on the development machine
+`D:\VH-Booker\mobile\v-court`), is the **main Android development repository**.
+Claude Code loads this file through [CLAUDE.md](CLAUDE.md). At the start of every
+session, read [context](docs/CONTEXT.md),
 [progress](docs/PROGRESS.md), [next-session plan](docs/NEXT_SESSION.md),
 [technology stack](docs/TECH_STACK.md) and [desktop source map](docs/DESKTOP_REFERENCE.md).
 Use [setup](docs/SETUP.md) for build and device prerequisites and
@@ -9,8 +11,10 @@ Use [setup](docs/SETUP.md) for build and device prerequisites and
 
 ## Current desktop reference is mandatory
 
-- Always consult `D:\VH-Booker\vh-tennis-booker` before translating booking
-  behavior, labels, settings or tests. Its `develop` branch is the source of
+- Always consult the desktop repository, `servedbyhau/vh-tennis-booker` (on the
+  development machine `D:\VH-Booker\vh-tennis-booker`; in a cloud session, a clone
+  of its GitHub `develop`), before translating booking behavior, labels, settings
+  or tests. Its `develop` branch is the source of
   truth, and changes after any dated snapshot in V Court docs take precedence.
 - Compare local `develop` with remote `refs/heads/develop` before relying on it.
   Fetch the remote branch when it is newer, then inspect `origin/develop` with
@@ -22,6 +26,30 @@ Use [setup](docs/SETUP.md) for build and device prerequisites and
   (`feat/android-on-device`). Read it with `git show <commit>:<path>` as
   documented in [DESKTOP_REFERENCE.md](docs/DESKTOP_REFERENCE.md). Use it as
   compatibility evidence; current desktop `develop` owns booking behavior.
+
+## Sessions on the development machine or in the cloud
+
+- A session runs either on the Windows development machine (the `D:\` paths in
+  these docs, MuMu, the Android SDK) or in a cloud container with a clone of this
+  repository and no `D:\` drive. [SETUP.md](docs/SETUP.md), "Cloud sessions",
+  says what a cloud session can and cannot do; device gates need the machine.
+- Before the first commit of a session, set the identity and signing below in this
+  repository's own Git config; a cloud container's global config may sign commits
+  under another identity.
+
+## Commits and pull requests
+
+- Author and committer: `Pham Van Hau <haucaron@gmail.com>`, unsigned:
+  `git config user.name "Pham Van Hau"`, `git config user.email haucaron@gmail.com`,
+  `git config commit.gpgsign false`.
+- No AI attribution anywhere on GitHub: no `Co-Authored-By`, `Claude-Session` or
+  "Generated with" lines in commit messages, pull request descriptions or
+  comments. A tool may append such a line to a pull request description; read the
+  description back after creating the pull request and edit the line out.
+- `develop` must survive a promotion to `main`. The repository deletes a merged
+  pull request's head branch, and a `develop` to `main` pull request has `develop`
+  as its head: protect `develop`, or restore it at once with
+  `git push origin <its last commit>:refs/heads/develop`.
 
 ## Planning and branches
 

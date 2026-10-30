@@ -13,7 +13,8 @@ Last reviewed: 2026-10-30. Verify Git and source state at each new session.
   and merge back after validation; stable `develop` work is promoted to
   `main`. This branch is separate from the desktop's `develop` reference.
 - Always consult the latest desktop `develop` at
-  `D:\VH-Booker\vh-tennis-booker` when porting behavior. Check the remote
+  `D:\VH-Booker\vh-tennis-booker` (GitHub `servedbyhau/vh-tennis-booker`; a
+  cloud session clones its `develop`) when porting behavior. Check the remote
   branch first; [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) maps the current
   source and tests. GitHub `develop` was at `a16240a` (release 0.18.1 plus
   unreleased tooling and docs) at the 2026-10-30 sync; refresh that observation.
