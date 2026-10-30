@@ -1,21 +1,22 @@
 # V Court project context
 
-Last reviewed: 2026-10-29. Verify Git and source state at each new session.
+Last reviewed: 2026-10-30. Verify Git and source state at each new session.
 
 ## Decisions
 
-- `v-court` is the main repository and working folder from now on.
-  `vh-tennis-booker-android` is a mobile experiment in the original desktop
-  repository; `vh-tennis-booker` remains the desktop product. Treat both
-  sibling folders as read-only references unless the user asks otherwise.
+- `v-court` is the main repository and working folder. The old Android lab
+  worktree has been removed; its reviewed source remains in desktop Git at
+  `b85a70e1bc582020d7bea4dbe65175c18fdbf24a` (`feat/android-on-device`).
+  Read it with `git show` using [the source map](DESKTOP_REFERENCE.md).
+  Treat the desktop checkout as a read-only reference for V Court work.
 - V Court's `develop` is the integration branch. New task branches start there
   and merge back after validation; stable `develop` work is promoted to
   `main`. This branch is separate from the desktop's `develop` reference.
 - Always consult the latest desktop `develop` at
   `D:\VH-Booker\vh-tennis-booker` when porting behavior. Check the remote
   branch first; [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) maps the current
-  source and tests. The 2026-10-29 local and remote heads were both `50ed350`
-  (release 0.18.0), but that observation must be refreshed.
+  source and tests. GitHub `develop` was at `a16240a` (release 0.18.1 plus
+  unreleased tooling and docs) at the 2026-10-30 sync; refresh that observation.
 - Develop and test on MuMu for the current phase. The eventual product runs
   completely on an Android phone without a PC; physical tests are deferred.
 - Use the completed lab's [Java/Shizuku/UiAutomation stack](TECH_STACK.md) as
@@ -37,16 +38,17 @@ Last reviewed: 2026-10-29. Verify Git and source state at each new session.
 
 ## Verified external baseline
 
-The sibling Android lab has a Java UiAutomation instrumentation driver, protocol
+The archived Android lab has a Java UiAutomation instrumentation driver, protocol
 1 over a local abstract socket, and a Java Shizuku shell bridge. On MuMu Android
 15 it started the driver, read Vinhomes UI and verified taps on its own test
 target. The documented real booking used host Python; it did not establish an
 Android-controlled booking engine. Both lab and driver APKs were rebuilt from
 source on 2026-10-25. MuMu was disconnected during that later review.
 
-The lab is in `D:\VH-Booker\vh-tennis-booker-android\android`. Check the latest
-desktop `develop` before porting: venue loading, quota notices and month
-navigation changed after the lab branch.
+The lab's source and observations can be read from its pinned Git commit;
+they do not require the deleted worktree. Check the latest desktop `develop`
+before porting: venue loading, quota notices and month navigation changed
+after the lab branch.
 
 ## Current repo state
 

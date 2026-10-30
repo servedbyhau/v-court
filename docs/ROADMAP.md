@@ -1,7 +1,10 @@
 # Desktop-to-Android migration roadmap
 
 Reviewed against `D:\VH-Booker\vh-tennis-booker` local and remote `develop`
-at `50ed350` (v0.18.0) on 2026-10-29. This is a dated baseline: before each
+at `50ed350` (v0.18.0) on 2026-10-29, and synced with GitHub `develop` at
+`a16240a` (v0.18.1) on 2026-10-30; the changes are listed in
+[DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md#desktop-changes-since-the-last-v-court-baseline).
+This is a dated baseline: before each
 implementation slice, compare `develop` with the remote and read the latest
 source and tests named in [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md). The
 Android lab is evidence for Shizuku/UiAutomation compatibility, not the

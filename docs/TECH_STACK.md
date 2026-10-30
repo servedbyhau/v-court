@@ -1,7 +1,9 @@
 # V Court Android technology stack
 
-Decision recorded 2026-10-29 from the completed compatibility lab's
-`docs/mobile/TECH_STACK.md`. This is the chosen foundation for V Court. The
+Decisions recorded 2026-10-29 from the completed compatibility lab assessment.
+These adopted choices are preserved here. The lab implementation and build
+scripts are available at the pinned Git commit in
+[DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md). The
 **implemented** part in this repository is currently the driver and a minimal
 native app shell with reproducible builds; the driver session and booking engine
 are next slices.
@@ -11,7 +13,8 @@ are next slices.
 | App language and UI | Native Android Java, Android Views for the initial product screens | Minimal `dev.vcourt.mobile` app shell shows Shizuku readiness. The lab's `MainActivity` was not imported. |
 | Privileged execution | Shizuku API 13.1.5, UserService in shell mode (UID 2000) | App builds with pinned Shizuku AARs and can request permission. Product UserService/session is not yet implemented. Shizuku is separately installed. |
 | UI driver | Java Android Instrumentation using `UiAutomation` | `android/app` and `tools/build_driver.py` currently build a separate development APK. It is not an `AccessibilityService`. Release packaging must be proven as one APK. |
-| Driver protocol | Newline-delimited JSON protocol 1 over local abstract socket `court-driver` | Implemented by the driver. The Android client and ownership rules are next. |
+| Driver protocol | Newline-delimited JSON protocol 1 over local abstract socket `court-driver` | Implemented by the driver. The client (`dev.vcourt.engine.driver`, F2) numbers commands, matches replies and treats a timeout, end of stream, failed connection, unreadable or mismatched reply as a lost connection; a refusal leaves it usable. The Android-owned session and ownership rules are next (F3). |
+| Engine tests | JUnit 5 (console launcher 1.11.3, pinned by SHA-256) on the JVM through `tools/test_java.py` | The engine under `dev.vcourt.engine` is plain Java 11 without Android imports, so booking logic and the protocol client are tested without a device; the script refuses an Android import there. |
 | Active-run lifecycle | Android foreground service, notification, partial wake lock and monotonic clock | Proven for a user-started 90-second lab probe; daily scheduling and product lifecycle remain to be designed. |
 | Android build | Python 3.9+ scripts calling SDK 35, Build Tools 35.0.0 (`aapt2`, `d8`, `zipalign`, `apksigner`) and JDK 17+; Java source/target 11 | Both APKs build locally. No Gradle project. Shizuku AARs are pinned by SHA-256. |
 | Android versions | Driver minimum SDK 30, target SDK 35; app minimum SDK 33, target SDK 35 | Both APK builds set these values. Phone support remains unvalidated. |
