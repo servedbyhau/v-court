@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated after F2a's code merged (PR #7) on 2026-10-30. Read
+Updated when phase A (F3, F4) was planned on 2026-10-30. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -27,13 +27,25 @@ Python is build-time tooling only. V Court feature branches start from its own
 | S2 — Session context | `docs/vcourt-session-context` from `develop` (`cc472db`) | Merged through PR #6 at `3a3baca`. | Docs agree; links checked. |
 | F2a — One-APK architecture proof | From `develop` (`3a3baca`); merged through PR #7 at `333f2cd` | One APK with app and Instrumentation driver; Shizuku shell service starts it with `--no-restart`; the in-app proof runs hello, safe read/tap and cleanup. CI builds it. | Open: fresh single-APK install on MuMu and two passing proof reports, recorded on a `docs/` branch. |
 | D1 — F2a status and branch names | `docs/vcourt-f2a-status` from `develop` (`333f2cd`) | Status notes say F2a merged with its MuMu run open; AGENTS.md states the branch naming rule. | Docs agree; links checked; merge into `develop`. |
-| F3 — Owned Shizuku session | `feat/vcourt-driver-session` from `develop` after F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped; merge into `develop`. |
-| F4 — MuMu proof | `test/vcourt-mumu-session` from `develop` after F3 | Run hello, Vinhomes UI read, safe V Court test tap and cleanup from Android app. | Redacted evidence shows success with no host booking commands; merge into `develop`; no booking submitted. |
+| F3 — Owned driver session | `feat/vcourt-driver-session` from `develop` (`734a531`) | Implemented. `DriverSession` in the engine: refuses a driver it did not start, starts one through a `DriverLauncher`, waits for `hello` (protocol and version), stops it and ends it if it does not stop, can be cancelled from another thread; Android `DriverLauncher` and `DriverConnector` over `ShellBridge` and `LocalSocket`; the one-APK proof runs on it. | Fake lifecycle tests pass on the JVM; app compile check and CI build pass; merge into `develop`. |
+| F4 — Vinhomes read check | `feat/vcourt-vinhomes-read` stacked on F3 | In-app check: open a session, open Vinhomes Resident, read its screen and report only counts and whether the home tile label shows, return to V Court, tap V Court's test target, stop. | Compile check and CI build pass; merge into `develop` after F3. |
+| F2a/F4 device evidence | `test/vcourt-mumu-session` from `develop` after F4 | Run the one-APK proof twice and the Vinhomes read check once on MuMu; record the redacted reports. Completes M1. | Reports pass; no booking submitted. |
+| Two-APK removal | `chore/vcourt-drop-driver-apk` from `develop` after the device evidence | Stop building the separate driver APK in CI and docs once one APK is proven. | CI passes; docs agree. |
 
 Record actual base and result commits in [PROGRESS.md](PROGRESS.md). If a part
 grows too large, split it into new named branches here before coding.
 
-## Next: F2a, one-APK architecture proof
+## Phase A (M1): F3 and F4 code, then the device evidence
+
+Planned 2026-10-30. F3 ports the desktop's start and stop rules (`connect_driver`,
+`start_driver`, `stop_driver` in `driver.py`: start, `hello` every 0.1 s for up to
+10 s, `stop`, then end the driver when it does not stop) with V Court's ownership
+rule: a driver this session did not start is refused, never stopped. The proof's
+own start and stop code moves into it. F4 adds the Vinhomes read check, whose
+report never holds screen text. Both are coded in the cloud; the device evidence
+needs MuMu.
+
+## F2a, one-APK architecture proof
 
 The code merged into `develop` through PR #7 (`333f2cd`) before the device run,
 so that run is what remains; its result goes on its own branch from `develop`.
