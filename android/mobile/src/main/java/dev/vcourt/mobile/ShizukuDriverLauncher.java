@@ -57,6 +57,22 @@ final class ShizukuDriverLauncher implements DriverLauncher {
         }
     }
 
+    /**
+     * Run a {@link ShellService} app command through this launcher's service.
+     *
+     * @throws DriverException when it failed or the service is gone
+     */
+    void appCommand(int op, String pkg) throws DriverException {
+        try {
+            String error = connected().appCommand(op, pkg);
+            if (error != null) {
+                throw new DriverException(error);
+            }
+        } catch (RemoteException e) {
+            throw new DriverException("The Shizuku shell service is gone: " + e.getMessage(), e);
+        }
+    }
+
     @Override
     public void release() {
         if (bridge != null) {

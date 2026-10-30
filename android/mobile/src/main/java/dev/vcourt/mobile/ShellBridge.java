@@ -14,7 +14,7 @@ import rikka.shizuku.Shizuku;
 /** The app's side of {@link ShellService}: binds it through Shizuku and calls it. */
 final class ShellBridge {
     /** Raised when the service changes; Shizuku then replaces a running older one. */
-    private static final int SERVICE_VERSION = 1;
+    private static final int SERVICE_VERSION = 2;
 
     /** What the service reports about the {@code am} process it started. */
     static final class State {
@@ -85,6 +85,27 @@ final class ShellBridge {
             return new State(reply.readInt(), reply.readInt() != 0, reply.readInt(),
                     reply.readString());
         } finally {
+            reply.recycle();
+        }
+    }
+
+    /** Run {@link ShellService}'s app command {@code op}; return null, or why it failed. */
+    String appCommand(int op, String pkg) throws RemoteException {
+        IBinder service = binder;
+        if (service == null) {
+            throw new RemoteException("The Shizuku shell service is not connected");
+        }
+        Parcel data = Parcel.obtain();
+        Parcel reply = Parcel.obtain();
+        try {
+            data.writeInterfaceToken(ShellService.DESCRIPTOR);
+            data.writeInt(op);
+            data.writeString(pkg);
+            service.transact(ShellService.APP_COMMAND, data, reply, 0);
+            reply.readException();
+            return reply.readString();
+        } finally {
+            data.recycle();
             reply.recycle();
         }
     }

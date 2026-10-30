@@ -32,12 +32,29 @@ public final class ShellService extends Binder {
     static final int DRIVER_STATE = FIRST_CALL_TRANSACTION + 1;
     /** End {@code am}: a last resort when the driver did not stop on request. */
     static final int KILL_DRIVER = FIRST_CALL_TRANSACTION + 2;
+    /**
+     * Run one of the app commands below on a package (or none, for {@link #QUIET}); replies
+     * an error message, or null when the command succeeded.
+     */
+    static final int APP_COMMAND = FIRST_CALL_TRANSACTION + 3;
+    /** {@code am force-stop}: the flow's {@code restartApp}. Never V Court itself. */
+    static final int STOP_APP = 1;
+    /** Open the package at its launcher activity, as uiautomator2's {@code app_start}. */
+    static final int START_APP = 2;
+    /** Turn off animations and notification banners (the desktop's {@code QUIET_SETTINGS}). */
+    static final int QUIET = 3;
     /** Exit code reported while {@code am} runs or before it ever ran. */
     static final int NO_EXIT = Integer.MIN_VALUE;
 
     private static final String TAG = "VCourtShell";
     private static final int OUTPUT_LINES = 30;
     private static final int LINE_LENGTH = 300;
+    private static final long COMMAND_TIMEOUT_S = 15;
+    private static final java.util.regex.Pattern PACKAGE_NAME =
+            java.util.regex.Pattern.compile("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+");
+    private static final String[] QUIET_SETTINGS = {"window_animation_scale",
+        "transition_animation_scale", "animator_duration_scale",
+        "heads_up_notifications_enabled"};
 
     private final ArrayDeque<String> output = new ArrayDeque<>();
     private java.lang.Process am;
@@ -73,6 +90,13 @@ public final class ShellService extends Binder {
                 kill();
                 reply.writeNoException();
                 return true;
+            case APP_COMMAND: {
+                data.enforceInterface(DESCRIPTOR);
+                String error = appCommand(data.readInt(), data.readString());
+                reply.writeNoException();
+                reply.writeString(error);
+                return true;
+            }
             default:
                 return super.onTransact(code, data, reply, flags);
         }
@@ -144,6 +168,56 @@ public final class ShellService extends Binder {
         reply.writeInt(running() ? 1 : 0);
         reply.writeInt(exitCode);
         reply.writeString(String.join("\n", output));
+    }
+
+    /** Run one fixed command; each argument is passed as is, never through a shell. */
+    private static String appCommand(int op, String pkg) {
+        java.util.List<String[]> commands = new java.util.ArrayList<>();
+        if (op == QUIET) {
+            for (String setting : QUIET_SETTINGS) {
+                commands.add(new String[] {"/system/bin/settings", "put", "global", setting, "0"});
+            }
+        } else {
+            if (pkg == null || !PACKAGE_NAME.matcher(pkg).matches()) {
+                return "Not a package name: " + pkg;
+            }
+            if (op == STOP_APP && !pkg.equals(DriverContract.PACKAGE)) {
+                commands.add(new String[] {"/system/bin/am", "force-stop", pkg});
+            } else if (op == START_APP) {
+                commands.add(new String[] {"/system/bin/monkey", "-p", pkg, "-c",
+                    "android.intent.category.LAUNCHER", "1"});
+            } else {
+                return "Refused app command " + op + " on " + pkg;
+            }
+        }
+        for (String[] command : commands) {
+            String error = runCommand(command);
+            if (error != null) {
+                return error;
+            }
+        }
+        return null;
+    }
+
+    private static String runCommand(String[] command) {
+        try {
+            java.lang.Process process = new ProcessBuilder(command).redirectErrorStream(true)
+                    .start();
+            // These commands print a line or two, far below a pipe's buffer: wait, then read.
+            if (!process.waitFor(COMMAND_TIMEOUT_S, java.util.concurrent.TimeUnit.SECONDS)) {
+                process.destroy();
+                return command[0] + " did not end in " + COMMAND_TIMEOUT_S + " s";
+            }
+            byte[] output = process.getInputStream().readAllBytes();
+            int code = process.exitValue();
+            return code == 0 ? null : command[0] + " ended with " + code + ": "
+                    + new String(output, StandardCharsets.UTF_8).trim();
+        } catch (IOException e) {
+            return command[0] + " did not start: " + e.getMessage();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return command[0] + " was interrupted";
+        }
     }
 
     private synchronized void kill() {
