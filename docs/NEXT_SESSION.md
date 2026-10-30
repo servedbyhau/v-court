@@ -72,5 +72,35 @@ so that run is what remains; its result goes on its own branch from `develop`.
    service, then a driver run without the instrumentation (UiAutomation made in
    the shell service).
 
+## Full build before device tests (decided 2026-10-30)
+
+The user chose to code the whole app first and test it on MuMu afterwards,
+fixing what fails. Each part below is its own branch, each stacked on the one
+before (so they merge in this order, without conflicts), committed locally only:
+nothing is pushed or opened as a pull request until the user asks, and then a
+branch is squashed into one commit dated that day. Until the device tests,
+`develop` is checked by CI and fake tests only; PROGRESS marks each part "not run
+on a device".
+
+| Order | Branch | Part | Desktop source ported |
+|---|---|---|---|
+| 1 | `docs/vcourt-full-build-plan` | This plan. | — |
+| 2 | `feat/vcourt-screen-model` | Screen model: dump parsing, node matching, geometry. | `screen.py`, `geometry.py` |
+| 3 | `feat/vcourt-app-language` | Labels per app language and language detection. | `app_language.py` |
+| 4 | `feat/vcourt-catalog` | Subdivisions, sports, venues and courts. | `catalog.py` |
+| 5 | `feat/vcourt-booking-request` | What to book, validated; settings the flow reads. | `config.py` (booking parts) |
+| 6 | `feat/vcourt-booking-flow` | The booking flow behind a `Device` interface, with a fake app. | `flow.py`, `tests/test_flow.py` |
+| 7 | `feat/vcourt-run-coordinator` | Opening-time clock, bounded device calls, rounds and events. | `clock.py`, `watchdog.py`, `runner.py`, `events.py` |
+| 8 | `feat/vcourt-driver-device` | The flow's `Device` over a `DriverSession`. | `driver.py` (`DriverDevice`) |
+| 9 | `feat/vcourt-run-service` | Foreground run service, wake lock, run notification. | — |
+| 10 | `feat/vcourt-daily-schedule` | Exact daily alarm, boot and late-start handling. | `schedule.py` (behavior only) |
+| 11 | `feat/vcourt-settings` | Stored settings and the settings screen. | `config.py`, UI wording |
+| 12 | `feat/vcourt-history` | Local run history and its screen. | `history.py` (behavior only) |
+| 13 | `feat/vcourt-product-ui` | Home screen: readiness, next run, run now, last result. | UI wording |
+
+A part may get sub-branches named `<its branch>-<detail>` when it grows. After
+part 13, the device tests in order: driver checks, dry run, a separately
+authorized real booking, a timed run, the scheduled run.
+
 F2a and F4 need MuMu and Shizuku online. Decide the update-signing approach
 before release work.
