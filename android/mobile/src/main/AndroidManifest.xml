@@ -26,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DriverChecksActivity" android:exported="false"
+            android:label="Driver checks" />
         <activity android:name=".SettingsActivity" android:exported="false"
             android:label="Booking settings" />
         <activity android:name=".HistoryActivity" android:exported="false"
