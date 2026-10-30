@@ -20,6 +20,15 @@ final class LocalSocketConnector implements DriverConnector {
             socket.close();
             throw e;
         }
-        return new StreamTransport(socket.getInputStream(), socket.getOutputStream(), socket);
+        // LocalSocket.close() only closes the descriptor, which leaves a blocked read waiting;
+        // shutting the input down first ends that read.
+        return new StreamTransport(socket.getInputStream(), socket.getOutputStream(), () -> {
+            try {
+                socket.shutdownInput();
+            } catch (IOException ignored) {
+                // closed below in any case
+            }
+            socket.close();
+        });
     }
 }
