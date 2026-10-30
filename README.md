@@ -15,9 +15,11 @@ minimal native app shell that checks Shizuku readiness. It has no Android
 booking engine or daily scheduler yet. The desktop Python backend and React UI
 are references, not app dependencies.
 
-The current builds produce two development APKs. The release target is one
-V Court APK. Python in `tools/` runs only on the build machine; Shizuku remains
-a separate installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
+The V Court APK now holds the app and its driver, with an in-app proof that
+starts the driver through Shizuku; that proof has not yet run on MuMu, so the
+separate driver APK is still built. The release target is one V Court APK.
+Python in `tools/` runs only on the build machine; Shizuku remains a separate
+installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
 for the ordered conversion from the desktop behavior.
 
 Development happens on short-lived branches from `develop`; validated work

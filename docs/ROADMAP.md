@@ -20,8 +20,10 @@ Instrumentation driver; Shizuku remains a separately installed prerequisite
 under the chosen stack. Python scripts are build tools on the host/CI only,
 never an APK runtime dependency.
 
-The current repository builds two development APKs and shows Shizuku permission
-status. It has no Android-owned driver session, booking engine or scheduler.
+The current repository builds the V Court APK with the driver inside and an
+in-app one-APK proof (slice 2, awaiting its MuMu run), plus the separate driver
+APK until that proof passes. It has no reusable driver session, booking engine
+or scheduler.
 First develop and validate on MuMu; physical-phone evidence is a later gate.
 
 ## What to translate

@@ -1,7 +1,10 @@
 """Build the V Court development app with Android SDK tools.
 
-Fetch the four pinned Shizuku AARs first with --fetch. Dependencies, APK and
-development signing key stay under ignored android/mobile/build; no Gradle is needed.
+The APK also holds the instrumentation driver, compiled from android/app's sources, so one
+install carries both (the one-APK layout); tools/build_driver.py still builds the driver
+alone for the two-APK scaffold. Fetch the four pinned Shizuku AARs first with --fetch.
+Dependencies, APK and development signing key stay under ignored android/mobile/build; no
+Gradle is needed.
 """
 
 from __future__ import annotations
@@ -19,6 +22,7 @@ import build_driver as sdk_tools
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "android" / "mobile" / "src" / "main"
+DRIVER_SOURCE = sdk_tools.SOURCES / "java"
 OUTPUT = ROOT / "android" / "mobile" / "build"
 VERSION = "13.1.5"
 DEPENDENCIES = {
@@ -55,7 +59,7 @@ def dependencies(fetch: bool) -> list[Path]:
 
 
 def build(sdk: Path, fetch: bool) -> Path:
-    """Build and sign the native Android app shell."""
+    """Build and sign the V Court app with its driver."""
     jars = dependencies(fetch)
     environ = dict(os.environ)
     windows = sys.platform == "win32"
@@ -80,6 +84,7 @@ def build(sdk: Path, fetch: bool) -> Path:
         sdk_tools.jdk_tool("javac", environ, windows), "-source", "11", "-target", "11",
         "-Xlint:-options", "-classpath", os.pathsep.join(str(p) for p in [android, *jars]),
         "-d", work / "classes", *sorted((SOURCE / "java").rglob("*.java")),
+        *sorted(DRIVER_SOURCE.rglob("*.java")),
     ])  # fmt: skip
     # A jar avoids Windows' command-line limit and D8's platform-dependent argfile parsing.
     compiled = work / "mobile.jar"

@@ -7,8 +7,9 @@ build needs four pinned Shizuku AARs. Neither build installs an APK or runs a
 booking.
 
 Python here is host-side build tooling. It is not packaged into an APK or
-needed to run V Court on Android. The current two APK outputs are a development
-scaffold; [the roadmap](ROADMAP.md) requires a one-APK architecture proof.
+needed to run V Court on Android. The V Court APK holds the app and the driver
+(the one-APK layout under proof); the separate driver APK is still built for the
+two-APK scaffold until that proof passes on MuMu.
 
 ## Local setup on the current Windows machine
 
@@ -47,8 +48,8 @@ testable off the device. `--fetch` downloads the pinned JUnit console launcher
 
 ## Device prerequisites for the next gate
 
-MuMu, Vinhomes Resident, Shizuku in non-root shell mode and the separate
-driver APK are needed for live tests. `adb` is optional for the build and is
+MuMu, Vinhomes Resident and Shizuku in non-root shell mode are needed for live
+tests; the V Court APK carries its own driver. `adb` is optional for the build and is
 not on `PATH` in the checked shell; MuMu provides it under
 `C:\Program Files\Netease\MuMuPlayer\nx_main\adb.exe`. Use the intended
 MuMu instance explicitly. The archived compatibility lab's
@@ -61,14 +62,41 @@ does not establish an Android-controlled session or booking. The next gate is
 an Android app that owns the Shizuku session, performs `hello`, reads a screen,
 taps only its own safe target and cleans up. See [NEXT_SESSION.md](NEXT_SESSION.md).
 
+## One-APK proof (F2a)
+
+On MuMu with Shizuku running (adb mode) and nothing else serving `court-driver`
+(stop the separate driver APK's instrumentation if it runs):
+
+1. Install only the V Court APK (uninstall an older development build first if
+   its signing key differs) and open V Court.
+2. Tap **Authorize Shizuku** and allow V Court.
+3. Tap **Run one-APK proof**. The report under the test target lists each step as
+   `PASS` or `FAIL` and ends with `RESULT:`; the same lines go to logcat with the
+   tag `VCourtProof` (`adb logcat -s VCourtProof VCourtShell CourtDriver`).
+4. Run it a second time without restarting V Court: the driver must start again
+   in the same app process (the report shows the app pid).
+
+The report reads only V Court's own screen, so it holds no personal data; copy it
+into [PROGRESS.md](PROGRESS.md). A `FAIL` at `am instrument` shows what `am`
+printed; record it as the blocker ([NEXT_SESSION.md](NEXT_SESSION.md) names the
+fallbacks).
+
 ## Cloud sessions
 
 A cloud session (Claude Code on the web) has a clone of this repository and a
 JDK, but no `D:\` drive, MuMu or device. Checked on 2026-10-30:
 
 - `tools/test_java.py --fetch` works: JUnit comes from Maven Central, which can
-  answer 429 for a while; run it again later. The engine and its tests can be
-  written and verified there.
+  answer 429 for a while; run it again later, or download the same file from
+  Google's mirror `https://maven-central.storage-download.googleapis.com/maven2/`
+  into `android/mobile/build/deps/` (the script still checks its SHA-256). The
+  engine and its tests can be written and verified there.
+- App and driver code can be compiled, not built: `javac` against
+  `org.robolectric:android-all-instrumented` 15 (from the same mirror), the
+  Shizuku jars and two empty stand-ins for the
+  `org.robolectric.internal.bytecode` interfaces `InstrumentedInterface` and
+  `ShadowedObject`. That jar holds hidden APIs too, so it catches compile errors,
+  not the use of a non-public API.
 - The Android SDK cannot be downloaded (`dl.google.com` is refused), so the APK
   builds run in CI only: open the pull request and read its `Android builds` run.
 - Pushing branches works once the repository is attached to the session with write
