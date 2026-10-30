@@ -2,9 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.vcourt.mobile">
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+    <!-- A run: the foreground service that books, kept awake, posting its outcome; the run
+         clock asks a time server (NTP) before waiting for the opening time. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The daily run: an exact alarm at the wake-up time, set again after a reboot. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
-        <package android:name="dev.courtbooker.driver" />
+        <!-- Vinhomes Resident, which the driver reads; Android 11 and later hide it otherwise. -->
+        <package android:name="com.vinhomes.resident" />
     </queries>
     <application android:label="V Court" android:allowBackup="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
@@ -15,9 +26,33 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DriverChecksActivity" android:exported="false"
+            android:label="Driver checks" />
+        <activity android:name=".SettingsActivity" android:exported="false"
+            android:label="Booking settings" />
+        <activity android:name=".HistoryActivity" android:exported="false"
+            android:label="Run history" />
+        <service android:name=".RunService" android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Books a court in another app at its opening time, on the user's request or schedule" />
+        </service>
+        <receiver android:name=".DailySchedule$AlarmReceiver" android:exported="false" />
+        <receiver android:name=".DailySchedule$RestoreReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <provider android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="dev.vcourt.mobile.shizuku"
             android:enabled="true" android:exported="true" android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
+    <!-- The driver, compiled from android/app into this APK. It targets V Court itself and
+         is started by ShellService with am instrument -w no-restart flag, which loads it into
+         the running V Court process instead of force-stopping the package. -->
+    <instrumentation android:name="dev.courtbooker.driver.Driver"
+        android:label="V Court driver"
+        android:targetPackage="dev.vcourt.mobile" />
 </manifest>

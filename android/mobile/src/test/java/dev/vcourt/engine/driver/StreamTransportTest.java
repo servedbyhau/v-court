@@ -3,6 +3,7 @@ package dev.vcourt.engine.driver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -18,7 +19,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
@@ -98,6 +101,37 @@ class StreamTransportTest {
 
         assertTrue(closed[0]);
         assertThrows(IOException.class, () -> transport.send("{}"));
+    }
+
+    /**
+     * Closing returns at once while the reader waits on a connection the peer keeps open: the
+     * driver inside V Court (started with --no-restart) never closes its end, and closing the
+     * reader first waited for that read forever (MuMu, 2026-10-30). The input stands for an
+     * Android {@code LocalSocket}: closing its stream does not wake a blocked read; only the
+     * socket's shutdown, the resource, does.
+     */
+    @Test
+    void closingReturnsWhileThePeerKeepsTheConnectionOpen() throws Exception {
+        CountDownLatch shutdown = new CountDownLatch(1);
+        InputStream socketInput = new InputStream() {
+            @Override
+            public int read() throws IOException {
+                try {
+                    shutdown.await();
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+                return -1;
+            }
+        };
+        StreamTransport transport = new StreamTransport(socketInput, new ByteArrayOutputStream(),
+                shutdown::countDown);
+        Thread.sleep(100); // the reader thread is now blocked in its read
+
+        assertTimeoutPreemptively(Duration.ofSeconds(2), transport::close);
+
+        assertEquals(0, shutdown.getCount());
+        assertNull(transport.receive(1000));
     }
 
     /** The client over a real socket against a stand-in driver speaking protocol 1. */

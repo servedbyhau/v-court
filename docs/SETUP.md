@@ -7,8 +7,9 @@ build needs four pinned Shizuku AARs. Neither build installs an APK or runs a
 booking.
 
 Python here is host-side build tooling. It is not packaged into an APK or
-needed to run V Court on Android. The current two APK outputs are a development
-scaffold; [the roadmap](ROADMAP.md) requires a one-APK architecture proof.
+needed to run V Court on Android. The V Court APK holds the app and the driver
+(the one-APK layout under proof); the separate driver APK is still built for the
+two-APK scaffold until that proof passes on MuMu.
 
 ## Local setup on the current Windows machine
 
@@ -47,8 +48,8 @@ testable off the device. `--fetch` downloads the pinned JUnit console launcher
 
 ## Device prerequisites for the next gate
 
-MuMu, Vinhomes Resident, Shizuku in non-root shell mode and the separate
-driver APK are needed for live tests. `adb` is optional for the build and is
+MuMu, Vinhomes Resident and Shizuku in non-root shell mode are needed for live
+tests; the V Court APK carries its own driver. `adb` is optional for the build and is
 not on `PATH` in the checked shell; MuMu provides it under
 `C:\Program Files\Netease\MuMuPlayer\nx_main\adb.exe`. Use the intended
 MuMu instance explicitly. The archived compatibility lab's
@@ -60,6 +61,88 @@ Do not run a real booking without explicit authorization. A successful build
 does not establish an Android-controlled session or booking. The next gate is
 an Android app that owns the Shizuku session, performs `hello`, reads a screen,
 taps only its own safe target and cleans up. See [NEXT_SESSION.md](NEXT_SESSION.md).
+
+## Driver checks on MuMu (phase A)
+
+Two checks in V Court make phase A's device evidence: the one-APK proof (F2a) and
+the Vinhomes read check (F4). Both run the driver inside the V Court APK through
+Shizuku and stop it at the end; neither books anything.
+
+### One-APK proof
+
+On MuMu with Shizuku running (adb mode) and nothing else serving `court-driver`
+(stop the separate driver APK's instrumentation if it runs):
+
+1. Install only the V Court APK (uninstall an older development build first if
+   its signing key differs) and open V Court.
+2. Tap **Authorize Shizuku** and allow V Court.
+3. Tap **Run one-APK proof**. The report under the test target lists each step as
+   `PASS` or `FAIL` and ends with `RESULT:`; the same lines go to logcat with the
+   tag `VCourtProof` (`adb logcat -s VCourtProof VCourtShell CourtDriver`).
+4. Run it a second time without restarting V Court: the driver must start again
+   in the same app process (the report shows the app pid).
+
+The report reads only V Court's own screen, so it holds no personal data; copy it
+into [PROGRESS.md](PROGRESS.md). A `FAIL` at the driver's start shows what `am`
+printed; record it as the blocker ([NEXT_SESSION.md](NEXT_SESSION.md) names the
+fallbacks).
+
+### Vinhomes read check
+
+After the proof passes, with Vinhomes Resident installed and signed in on the
+same MuMu instance:
+
+1. Open V Court and tap **Read Vinhomes screen**. V Court starts the driver,
+   opens Vinhomes and reads it until the home screen's "Tiện ích" (or
+   "Utilities") tile shows, for up to 30 s. Nothing in Vinhomes is tapped.
+2. V Court comes back to the front by itself (or by one Back press, which the
+   report names), taps its own test target and stops the driver.
+3. The report ends with `RESULT:`; logcat tag `VCourtVinhomes`.
+
+The report holds only counts, timings and which home label showed, never text
+from the Vinhomes screen, so it can be copied into [PROGRESS.md](PROGRESS.md).
+If Vinhomes shows a sign-in or a notice instead of its home screen, close that by
+hand and run the check again.
+
+## Using V Court on MuMu
+
+The home screen shows whether Shizuku runs, V Court is authorized, Vinhomes Resident
+is installed and notifications are allowed. **Settings** sets the area, sport, court,
+slots and times; saving refuses invalid values. **Dry run now** runs every slot up to
+"Xác nhận" without submitting; **Book now** books for real after a confirmation.
+Each run shows a notification with a Cancel action while it runs, then its outcome
+(booked, refused, or *unknown*: check the app). **History** lists the runs.
+
+**Daily run** sets an exact alarm at the wake-up time (05:45 by default): the run
+opens Vinhomes, waits on its home screen, opens the utilities list
+`warm_up_seconds` before the opening time and taps 0.1 s after it, booking the day
+after tomorrow. "Dry run only" makes it stop before "Xác nhận", for trying the
+schedule out. The alarm survives a reboot; Shizuku does not (without root), so start
+Shizuku again after a reboot. **Driver checks** holds the phase A checks above.
+
+## Cloud sessions
+
+A cloud session (Claude Code on the web) has a clone of this repository and a
+JDK, but no `D:\` drive, MuMu or device. Checked on 2026-10-30:
+
+- `tools/test_java.py --fetch` works: JUnit comes from Maven Central, which can
+  answer 429 for a while; run it again later, or download the same file from
+  Google's mirror `https://maven-central.storage-download.googleapis.com/maven2/`
+  into `android/mobile/build/deps/` (the script still checks its SHA-256). The
+  engine and its tests can be written and verified there.
+- App and driver code can be compiled, not built: `javac` against
+  `org.robolectric:android-all-instrumented` 15 (from the same mirror), the
+  Shizuku jars and two empty stand-ins for the
+  `org.robolectric.internal.bytecode` interfaces `InstrumentedInterface` and
+  `ShadowedObject`. That jar holds hidden APIs too, so it catches compile errors,
+  not the use of a non-public API.
+- The Android SDK cannot be downloaded (`dl.google.com` is refused), so the APK
+  builds run in CI only: open the pull request and read its `Android builds` run.
+- Pushing branches works once the repository is attached to the session with write
+  access; deleting a branch on GitHub is refused, so the user deletes merged
+  branches.
+- Commit identity and signing: see [AGENTS.md](../AGENTS.md), "Commits and pull
+  requests". The container's global Git config signs commits otherwise.
 
 ## Continuous integration
 

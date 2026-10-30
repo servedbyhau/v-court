@@ -19,6 +19,13 @@ git -C D:\VH-Booker\vh-tennis-booker rev-parse develop
 git -C D:\VH-Booker\vh-tennis-booker ls-remote origin refs/heads/develop
 ```
 
+In a cloud session, which has no `D:\` drive, read a fresh shallow clone of the
+desktop's GitHub `develop` instead (any scratch folder outside this repository):
+
+```bash
+git clone --depth 1 --branch develop https://github.com/servedbyhau/vh-tennis-booker <folder>
+```
+
 If the remote hash differs, fetch `origin develop`, then read files from
 `origin/develop` with `git show origin/develop:<path>` or update the local
 reference without switching the desktop working tree. If the remote cannot be
@@ -49,7 +56,11 @@ for protocol client and booking behavior. The lab branch was local-only when
 checked on 2026-10-30; it was not listed on desktop `origin`. A fresh clone
 needs that reviewed commit transferred from the existing local repository
 before these commands work. Do not assume it can be fetched from GitHub or
-substitute an unverified copy when the commit is unavailable.
+substitute an unverified copy when the commit is unavailable. Pushing it as the
+tag `archive/android-lab` on the desktop repository (not done as of 2026-10-30)
+would make it readable from any session with
+`git fetch origin tag archive/android-lab`; a cloud session cannot read it
+until then.
 
 ## Source map
 

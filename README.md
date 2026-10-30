@@ -10,14 +10,18 @@ desktop repository's Git history; its old worktree folder has been removed.
 
 The completed lab demonstrated an Android-controlled driver read and tap on
 MuMu. A separate real booking during that research was controlled by Python
-on the host. This repository now builds a Java instrumentation driver and a
-minimal native app shell that checks Shizuku readiness. It has no Android
-booking engine or daily scheduler yet. The desktop Python backend and React UI
+on the host. This repository now holds the whole app: the booking engine ported
+from the desktop, with its tests, and a native app that runs it through its own
+driver, on demand or daily at the opening time, with settings, history and
+notifications. It has not yet run on a device; the order of the device tests is in
+[the next-session plan](docs/NEXT_SESSION.md). The desktop Python backend and React UI
 are references, not app dependencies.
 
-The current builds produce two development APKs. The release target is one
-V Court APK. Python in `tools/` runs only on the build machine; Shizuku remains
-a separate installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
+The V Court APK now holds the app and its driver, with an in-app proof that
+starts the driver through Shizuku; that proof has not yet run on MuMu, so the
+separate driver APK is still built. The release target is one V Court APK.
+Python in `tools/` runs only on the build machine; Shizuku remains a separate
+installed prerequisite. See [the migration roadmap](docs/ROADMAP.md)
 for the ordered conversion from the desktop behavior.
 
 Development happens on short-lived branches from `develop`; validated work
@@ -25,7 +29,8 @@ merges back into `develop`, and a stable milestone is promoted to `main`.
 See [the branch workflow](docs/WORKFLOW.md).
 
 **Desktop reference:** always check the latest `develop` at
-`D:\VH-Booker\vh-tennis-booker` before porting behavior. The lab's inherited
+`D:\VH-Booker\vh-tennis-booker` (GitHub `servedbyhau/vh-tennis-booker`) before
+porting behavior. The lab's inherited
 Python tree is older. See [desktop source map](docs/DESKTOP_REFERENCE.md).
 
 For a fresh machine, follow [Android setup](docs/SETUP.md). The chosen stack

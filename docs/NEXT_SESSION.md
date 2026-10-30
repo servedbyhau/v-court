@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated after C1 merged (PR #2, `f9fe06b`) and the desktop sync S1 on 2026-10-30. Read
+Updated when the full build was coded on 2026-10-30. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -22,27 +22,102 @@ Python is build-time tooling only. V Court feature branches start from its own
 | R1 — Migration roadmap | `docs/vcourt-mobile-roadmap` from F1 HEAD (`757f95c`) | Complete at `2b47979`; included in `develop` and `main`; old task branch removed. | Desktop source mapped to ordered Android slices and one-APK gate; docs checked. |
 | B1 — `develop` workflow | `docs/vcourt-develop-workflow` from `develop` (`6d55713`) | Merged into `develop` at `0c72e67`, then into `main` through PR #1; old task branch removed. | Branch topology recorded; subsequent work branches target `develop`. |
 | C1 — Build readiness and source context | `fix/vcourt-build-readiness` from `develop` (`0c72e67`) | Fix at `68de4bb`; merged into `develop` through [PR #2](https://github.com/servedbyhau/v-court/pull/2) at `f9fe06b`. | GitHub CI and both local APK builds passed; lab references and Markdown links verified. No product runtime change. |
-| S1 — Desktop sync | `docs/vcourt-desktop-sync` from `develop` (`f9fe06b`) | Record desktop changes from `50ed350` to `a16240a` in DESKTOP_REFERENCE and refresh the dated baselines. | Docs agree on the new baseline; links checked; merge into `develop`. |
-| F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 (`40930fc`) | Implemented: `tools/test_java.py` (JUnit on the JVM), `DriverClient`, `StreamTransport` and JSON codec in `dev.vcourt.engine.driver`. | 57 tests pass locally; CI must pass the tests and both APK builds; merge into `develop` after S1. |
-| F2a — One-APK architecture proof | `spike/vcourt-one-apk` from `develop` after F2 | Prove one installable V Court APK containing app and Instrumentation driver on MuMu, with Shizuku startup, hello, safe read/tap and cleanup. | Fresh single-APK install and redacted device evidence pass; merge into `develop`. |
-| F3 — Owned Shizuku session | `feat/vcourt-driver-session` from `develop` after F2a | Adapt lab bridge into reusable Android-owned start/stop session with protocol/version check and cancellation. | Fake lifecycle tests and app build pass; no foreign driver stopped; merge into `develop`. |
-| F4 — MuMu proof | `test/vcourt-mumu-session` from `develop` after F3 | Run hello, Vinhomes UI read, safe V Court test tap and cleanup from Android app. | Redacted evidence shows success with no host booking commands; merge into `develop`; no booking submitted. |
+| S1 — Desktop sync | `docs/vcourt-desktop-sync` from `develop` (`f9fe06b`) | Merged through PR #3 at `930fdf4`. | Desktop changes from `50ed350` to `a16240a` recorded. |
+| F2 — Safe protocol client | `feat/vcourt-driver-client` stacked on S1 | Merged through PR #4 at `cc472db`; promoted to `main` through PR #5. | 57 JVM tests and both APK builds pass in CI. |
+| S2 — Session context | `docs/vcourt-session-context` from `develop` (`cc472db`) | Merged through PR #6 at `3a3baca`. | Docs agree; links checked. |
+| F2a — One-APK architecture proof | From `develop` (`3a3baca`); merged through PR #7 at `333f2cd` | One APK with app and Instrumentation driver; Shizuku shell service starts it with `--no-restart`; the in-app proof runs hello, safe read/tap and cleanup. CI builds it. | Open: fresh single-APK install on MuMu and two passing proof reports, recorded on a `docs/` branch. |
+| D1 — F2a status and branch names | `docs/vcourt-f2a-status` from `develop` (`333f2cd`) | Status notes say F2a merged with its MuMu run open; AGENTS.md states the branch naming rule. | Docs agree; links checked; merge into `develop`. |
+| F3 — Owned driver session | `feat/vcourt-driver-session` from `develop` (`734a531`) | Implemented. `DriverSession` in the engine: refuses a driver it did not start, starts one through a `DriverLauncher`, waits for `hello` (protocol and version), stops it and ends it if it does not stop, can be cancelled from another thread; Android `DriverLauncher` and `DriverConnector` over `ShellBridge` and `LocalSocket`; the one-APK proof runs on it. | Fake lifecycle tests pass on the JVM; app compile check and CI build pass; merge into `develop`. |
+| F4 — Vinhomes read check | `feat/vcourt-vinhomes-read` stacked on F3 | Implemented. In-app check: open a session, open Vinhomes Resident, read its screen and report only counts and whether the home tile label shows, return to V Court, tap V Court's test target, stop. | Compile check and CI build pass; merge into `develop` after F3. |
+| F2a/F4 device evidence | `test/vcourt-mumu-session` from `develop` after F4 | Run the one-APK proof twice and the Vinhomes read check once on MuMu; record the redacted reports. Completes M1. | Reports pass; no booking submitted. |
+| Two-APK removal | `chore/vcourt-drop-driver-apk` from `develop` after the device evidence | Stop building the separate driver APK in CI and docs once one APK is proven. | CI passes; docs agree. |
 
 Record actual base and result commits in [PROGRESS.md](PROGRESS.md). If a part
 grows too large, split it into new named branches here before coding.
 
-## First actions after F2
+## Phase A (M1): F3 and F4 code, then the device evidence
 
-1. Merge S1, then F2, into V Court's `develop` once CI passes on each; F2's CI
-   run is the first to build both APKs with the engine package inside.
-2. F2a needs MuMu and Shizuku online: prove the one-APK layout and record its
-   package/Instrumentation contract before F3. The app reaches the driver
-   through a `LocalSocket` to `court-driver`; wrap its streams in
-   `StreamTransport` and talk through `DriverClient`, so F2a reuses F2 as is.
-3. Refresh the desktop `develop` reference as described in
-   [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) before F3; the lab's
-   `ShellBridge` is the transport reference, available from its archived Git
-   commit rather than a folder.
+Planned 2026-10-30. F3 ports the desktop's start and stop rules (`connect_driver`,
+`start_driver`, `stop_driver` in `driver.py`: start, `hello` every 0.1 s for up to
+10 s, `stop`, then end the driver when it does not stop) with V Court's ownership
+rule: a driver this session did not start is refused, never stopped. The proof's
+own start and stop code moves into it. F4 adds the Vinhomes read check, whose
+report never holds screen text. Both are coded in the cloud; the device evidence
+needs MuMu.
+
+## F2a, one-APK architecture proof
+
+The code merged into `develop` through PR #7 (`333f2cd`) before the device run,
+so that run is what remains; its result goes on its own branch from `develop`.
+
+1. Code, done: the driver sources in `android/app` are compiled
+   into the V Court APK, which declares them as an Instrumentation targeting
+   itself. A Shizuku user service (`ShellService`, shell UID) runs
+   `am instrument -w --no-restart`: Android then loads the driver into the
+   running V Court process instead of force-stopping the package (checked in
+   the Android 15 framework, `INSTR_FLAG_NO_RESTART`; other versions unchecked). The app
+   connects a `LocalSocket` to `court-driver`, wraps it in `StreamTransport` and
+   runs `hello`, `current`, `dump`, one `click` on V Court's own test target,
+   then `stop`, and checks that the driver ended and the socket is gone. The
+   lab's `ShellBridge` could not be read in the cloud; this one is new.
+2. Checks, done: engine tests and a compile against an Android 15 framework jar
+   in the cloud; CI built and signed the APK on PR #7 and on `develop`.
+3. Device gate, open, on the development machine: install the one APK on MuMu with
+   Shizuku running, run the proof twice ([SETUP.md](SETUP.md), "Driver checks on MuMu"),
+   and record the redacted report in [PROGRESS.md](PROGRESS.md). No booking.
+4. Then record the package and Instrumentation contract in
+   [TECH_STACK.md](TECH_STACK.md) and [CONTEXT.md](CONTEXT.md). If
+   `--no-restart` is refused, record the blocker; the fallback is calling
+   `IActivityManager.startInstrumentation` with the same flag from the shell
+   service, then a driver run without the instrumentation (UiAutomation made in
+   the shell service).
+
+## Full build before device tests (decided 2026-10-30)
+
+The user chose to code the whole app first and test it on MuMu afterwards,
+fixing what fails. Each part below is its own branch, each stacked on the one
+before (so they merge in this order, without conflicts), committed locally only:
+nothing is pushed or opened as a pull request until the user asks, and then a
+branch is squashed into one commit dated that day. Until the device tests,
+`develop` is checked by CI and fake tests only; PROGRESS marks each part "not run
+on a device".
+
+| Order | Branch | Part | Desktop source ported |
+|---|---|---|---|
+| 1 | `docs/vcourt-full-build-plan` | This plan. | — |
+| 2 | `feat/vcourt-screen-model` | Screen model: dump parsing, node matching, geometry. | `screen.py`, `geometry.py` |
+| 3 | `feat/vcourt-app-language` | Labels, sports and the app's two languages. | `app_language.py`, `config.py` (`Labels`, `SPORTS`) |
+| 4 | `feat/vcourt-catalog` | Subdivisions, sports, venues and courts. | `catalog.py` |
+| 5 | `feat/vcourt-booking-request` | Booking settings and their validation. | `config.py` (booking parts) |
+| 6 | `feat/vcourt-booking-flow` | Events, errors, `Device`, and the booking flow with a fake app. | `flow.py`, `events.py`, `errors.py` |
+| 7 | `feat/vcourt-run-coordinator` | NTP run clock, waiting for the opening, rounds, quota skip. | `clock.py`, `runner.py` |
+| 8 | `feat/vcourt-driver-device` | The flow's `Device` over the driver; shell app commands. | `driver.py` (`DriverDevice`) |
+| 9 | `feat/vcourt-settings` | Stored settings and the settings screen. | `config.py`, UI wording |
+| 10 | `feat/vcourt-history` | Run history in SQLite and its screen. | `history.py` (behavior only) |
+| 11 | `feat/vcourt-run-service` | Foreground run service, wake lock, notifications. | `cli.py` (run steps) |
+| 12 | `feat/vcourt-daily-schedule` | Exact daily alarm, reboot and update restore. | `schedule.py` (behavior only) |
+| 13 | `feat/vcourt-product-ui` | Home screen; the driver checks get their own screen. | UI wording |
+| 14 | `docs/vcourt-full-build-status` | Docs brought to the built state. | — |
+
+All fourteen are coded and committed locally, each stacked on the one before; none is
+pushed. Settings and history moved ahead of the run service, which reads both. The
+desktop's `watchdog.py` is not ported: every driver command already has a 10 s limit
+(`DriverClient`) and each shell command 15 s (`ShellService`); a timeout ends the run
+after its round, as on the desktop.
+
+### Device tests after the build, in order
+
+1. Driver checks: the one-APK proof twice, the Vinhomes read check once
+   ([SETUP.md](SETUP.md), "Driver checks on MuMu"). Completes M1.
+2. **Dry run now** from the home screen; History shows each round and "dry run passed".
+3. A separately authorized real booking (**Book now**, two consecutive free slots on
+   today + 2); the user cancels them in the app. Completes M2.
+4. The daily run with "Dry run only" on and the wake-up a few minutes ahead: it waits
+   on the home screen and taps just after the opening time. Completes M3.
+5. The same after rebooting MuMu: the alarm comes back; Shizuku must be started again
+   by hand, and the run reports it when it is not.
+
+Each failure is fixed on its own `fix/vcourt-<topic>` branch from `develop`.
 
 F2a and F4 need MuMu and Shizuku online. Decide the update-signing approach
 before release work.
