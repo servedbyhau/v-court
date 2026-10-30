@@ -10,9 +10,9 @@ Adopted from the user's instructions on 2026-10-25; branch topology updated
 - `develop` is V Court's integration line and the base for new work. Keep it
   buildable; merge completed child branches into it. This is separate from
   the desktop repository's `develop`, which is a read-only behavior reference.
-- Each reviewable part gets a named branch such as `feat/...`, `fix/...`,
-  `docs/...`, `test/...`, `spike/...` or `chore/...` from the current
-  `develop`. Record the base commit, deliverable and exit check in the plan.
+- Each reviewable part gets a named branch from the current `develop`, named
+  as [AGENTS.md](../AGENTS.md) ("Planning and branches") says:
+  `<type>/vcourt-<topic>`. Record the base commit, deliverable and exit check in the plan.
   Review and merge the branch into `develop` after its exit check passes.
 - Do not push implementation work directly to `main`, force-push shared
   branches or silently promote an unverified MuMu/phone milestone. A stable

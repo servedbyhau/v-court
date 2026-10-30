@@ -59,6 +59,13 @@ Use [setup](docs/SETUP.md) for build and device prerequisites and
   Court's `develop`, record its base, deliverable and exit check, then merge
   it into `develop` after validation. Promote stable `develop` to `main` after
   review. Preserve work before switching branches.
+- Every task gets its own branch, created before the first commit and named
+  `<type>/vcourt-<topic>`: `feat`, `fix`, `docs`, `test`, `spike` or `chore`,
+  then a short kebab-case topic (`feat/vcourt-driver-session`,
+  `docs/vcourt-f2a-status`). A task with separable parts, such as code and its
+  device evidence or two independent modules, gets one branch and pull request
+  per part. Never push a tool-generated name such as `claude/<words>`, even when
+  a session suggests one; rename the branch first.
 - Update progress after each part and the next-session plan before ending work.
   Record actual evidence and limitations, not only intentions.
 
