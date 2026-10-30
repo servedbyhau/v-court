@@ -29,6 +29,7 @@ final class SettingsStore {
     private static final String PREFERENCES = "settings";
     private static final String KEY = "booking";
     private static final String SCHEDULED = "scheduled";
+    private static final String SCHEDULED_DRY_RUN = "scheduled_dry_run";
 
     private final SharedPreferences preferences;
 
@@ -75,6 +76,18 @@ final class SettingsStore {
 
     void setScheduled(boolean on) {
         preferences.edit().putBoolean(SCHEDULED, on).apply();
+    }
+
+    /**
+     * Tell whether the daily run stops before "Xác nhận": for trying the schedule out. Off by
+     * default: the daily run books for real.
+     */
+    boolean scheduledDryRun() {
+        return preferences.getBoolean(SCHEDULED_DRY_RUN, false);
+    }
+
+    void setScheduledDryRun(boolean on) {
+        preferences.edit().putBoolean(SCHEDULED_DRY_RUN, on).apply();
     }
 
     static JSONObject toJson(BookingSettings s) throws JSONException {

@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The daily run: an exact alarm at the wake-up time, set again after a reboot. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
         <!-- Vinhomes Resident, which the driver reads; Android 11 and later hide it otherwise. -->
@@ -32,6 +35,13 @@
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Books a court in another app at its opening time, on the user's request or schedule" />
         </service>
+        <receiver android:name=".DailySchedule$AlarmReceiver" android:exported="false" />
+        <receiver android:name=".DailySchedule$RestoreReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <provider android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="dev.vcourt.mobile.shizuku"
             android:enabled="true" android:exported="true" android:multiprocess="false"
