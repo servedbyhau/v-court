@@ -15,8 +15,8 @@ Last reviewed: 2026-10-30. Verify Git and source state at each new session.
 - Always consult the latest desktop `develop` at
   `D:\VH-Booker\vh-tennis-booker` when porting behavior. Check the remote
   branch first; [DESKTOP_REFERENCE.md](DESKTOP_REFERENCE.md) maps the current
-  source and tests. The 2026-10-30 local and remote heads were both `50ed350`
-  (release 0.18.0), but that observation must be refreshed.
+  source and tests. GitHub `develop` was at `a16240a` (release 0.18.1 plus
+  unreleased tooling and docs) at the 2026-10-30 sync; refresh that observation.
 - Develop and test on MuMu for the current phase. The eventual product runs
   completely on an Android phone without a PC; physical tests are deferred.
 - Use the completed lab's [Java/Shizuku/UiAutomation stack](TECH_STACK.md) as
