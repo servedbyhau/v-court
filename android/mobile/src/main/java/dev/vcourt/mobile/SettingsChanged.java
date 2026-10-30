@@ -8,6 +8,7 @@ final class SettingsChanged {
     }
 
     static void notify(Context context) {
-        // Nothing depends on the stored settings outside a run yet; the daily schedule will.
+        // The wake-up time may have moved.
+        DailySchedule.update(context);
     }
 }
