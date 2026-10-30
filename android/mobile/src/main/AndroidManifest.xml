@@ -16,6 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SettingsActivity" android:exported="false"
+            android:label="Booking settings" />
         <provider android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="dev.vcourt.mobile.shizuku"
             android:enabled="true" android:exported="true" android:multiprocess="false"
