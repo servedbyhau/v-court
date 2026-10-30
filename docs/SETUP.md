@@ -104,6 +104,22 @@ from the Vinhomes screen, so it can be copied into [PROGRESS.md](PROGRESS.md).
 If Vinhomes shows a sign-in or a notice instead of its home screen, close that by
 hand and run the check again.
 
+## Using V Court on MuMu
+
+The home screen shows whether Shizuku runs, V Court is authorized, Vinhomes Resident
+is installed and notifications are allowed. **Settings** sets the area, sport, court,
+slots and times; saving refuses invalid values. **Dry run now** runs every slot up to
+"Xác nhận" without submitting; **Book now** books for real after a confirmation.
+Each run shows a notification with a Cancel action while it runs, then its outcome
+(booked, refused, or *unknown*: check the app). **History** lists the runs.
+
+**Daily run** sets an exact alarm at the wake-up time (05:45 by default): the run
+opens Vinhomes, waits on its home screen, opens the utilities list
+`warm_up_seconds` before the opening time and taps 0.1 s after it, booking the day
+after tomorrow. "Dry run only" makes it stop before "Xác nhận", for trying the
+schedule out. The alarm survives a reboot; Shizuku does not (without root), so start
+Shizuku again after a reboot. **Driver checks** holds the phase A checks above.
+
 ## Cloud sessions
 
 A cloud session (Claude Code on the web) has a clone of this repository and a

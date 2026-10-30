@@ -1,6 +1,6 @@
 # V Court next-session plan
 
-Updated when phase A (F3, F4) was planned on 2026-10-30. Read
+Updated when the full build was coded on 2026-10-30. Read
 [context](CONTEXT.md), [progress](PROGRESS.md) and
 [workflow](WORKFLOW.md) first. Check Git status and remotes before editing.
 Real booking still requires explicit authorization for that test.
@@ -86,21 +86,38 @@ on a device".
 |---|---|---|---|
 | 1 | `docs/vcourt-full-build-plan` | This plan. | — |
 | 2 | `feat/vcourt-screen-model` | Screen model: dump parsing, node matching, geometry. | `screen.py`, `geometry.py` |
-| 3 | `feat/vcourt-app-language` | Labels per app language and language detection. | `app_language.py` |
+| 3 | `feat/vcourt-app-language` | Labels, sports and the app's two languages. | `app_language.py`, `config.py` (`Labels`, `SPORTS`) |
 | 4 | `feat/vcourt-catalog` | Subdivisions, sports, venues and courts. | `catalog.py` |
-| 5 | `feat/vcourt-booking-request` | What to book, validated; settings the flow reads. | `config.py` (booking parts) |
-| 6 | `feat/vcourt-booking-flow` | The booking flow behind a `Device` interface, with a fake app. | `flow.py`, `tests/test_flow.py` |
-| 7 | `feat/vcourt-run-coordinator` | Opening-time clock, bounded device calls, rounds and events. | `clock.py`, `watchdog.py`, `runner.py`, `events.py` |
-| 8 | `feat/vcourt-driver-device` | The flow's `Device` over a `DriverSession`. | `driver.py` (`DriverDevice`) |
-| 9 | `feat/vcourt-run-service` | Foreground run service, wake lock, run notification. | — |
-| 10 | `feat/vcourt-daily-schedule` | Exact daily alarm, boot and late-start handling. | `schedule.py` (behavior only) |
-| 11 | `feat/vcourt-settings` | Stored settings and the settings screen. | `config.py`, UI wording |
-| 12 | `feat/vcourt-history` | Local run history and its screen. | `history.py` (behavior only) |
-| 13 | `feat/vcourt-product-ui` | Home screen: readiness, next run, run now, last result. | UI wording |
+| 5 | `feat/vcourt-booking-request` | Booking settings and their validation. | `config.py` (booking parts) |
+| 6 | `feat/vcourt-booking-flow` | Events, errors, `Device`, and the booking flow with a fake app. | `flow.py`, `events.py`, `errors.py` |
+| 7 | `feat/vcourt-run-coordinator` | NTP run clock, waiting for the opening, rounds, quota skip. | `clock.py`, `runner.py` |
+| 8 | `feat/vcourt-driver-device` | The flow's `Device` over the driver; shell app commands. | `driver.py` (`DriverDevice`) |
+| 9 | `feat/vcourt-settings` | Stored settings and the settings screen. | `config.py`, UI wording |
+| 10 | `feat/vcourt-history` | Run history in SQLite and its screen. | `history.py` (behavior only) |
+| 11 | `feat/vcourt-run-service` | Foreground run service, wake lock, notifications. | `cli.py` (run steps) |
+| 12 | `feat/vcourt-daily-schedule` | Exact daily alarm, reboot and update restore. | `schedule.py` (behavior only) |
+| 13 | `feat/vcourt-product-ui` | Home screen; the driver checks get their own screen. | UI wording |
+| 14 | `docs/vcourt-full-build-status` | Docs brought to the built state. | — |
 
-A part may get sub-branches named `<its branch>-<detail>` when it grows. After
-part 13, the device tests in order: driver checks, dry run, a separately
-authorized real booking, a timed run, the scheduled run.
+All fourteen are coded and committed locally, each stacked on the one before; none is
+pushed. Settings and history moved ahead of the run service, which reads both. The
+desktop's `watchdog.py` is not ported: every driver command already has a 10 s limit
+(`DriverClient`) and each shell command 15 s (`ShellService`); a timeout ends the run
+after its round, as on the desktop.
+
+### Device tests after the build, in order
+
+1. Driver checks: the one-APK proof twice, the Vinhomes read check once
+   ([SETUP.md](SETUP.md), "Driver checks on MuMu"). Completes M1.
+2. **Dry run now** from the home screen; History shows each round and "dry run passed".
+3. A separately authorized real booking (**Book now**, two consecutive free slots on
+   today + 2); the user cancels them in the app. Completes M2.
+4. The daily run with "Dry run only" on and the wake-up a few minutes ahead: it waits
+   on the home screen and taps just after the opening time. Completes M3.
+5. The same after rebooting MuMu: the alarm comes back; Shizuku must be started again
+   by hand, and the run reports it when it is not.
+
+Each failure is fixed on its own `fix/vcourt-<topic>` branch from `develop`.
 
 F2a and F4 need MuMu and Shizuku online. Decide the update-signing approach
 before release work.

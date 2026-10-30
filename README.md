@@ -10,9 +10,11 @@ desktop repository's Git history; its old worktree folder has been removed.
 
 The completed lab demonstrated an Android-controlled driver read and tap on
 MuMu. A separate real booking during that research was controlled by Python
-on the host. This repository now builds a Java instrumentation driver and a
-minimal native app shell that checks Shizuku readiness. It has no Android
-booking engine or daily scheduler yet. The desktop Python backend and React UI
+on the host. This repository now holds the whole app: the booking engine ported
+from the desktop, with its tests, and a native app that runs it through its own
+driver, on demand or daily at the opening time, with settings, history and
+notifications. It has not yet run on a device; the order of the device tests is in
+[the next-session plan](docs/NEXT_SESSION.md). The desktop Python backend and React UI
 are references, not app dependencies.
 
 The V Court APK now holds the app and its driver, with an in-app proof that

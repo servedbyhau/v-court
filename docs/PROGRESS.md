@@ -24,7 +24,13 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
   F2, a plain-Java protocol client with JVM tests. Since F2a the app APK also
   holds the driver and can run the one-APK proof; CI builds it, but it has not
   run on a device. F3 adds the reusable driver session the proof now runs on.
-  There is no booking engine, daily scheduler or history yet.
+- The full app is coded on fourteen local branches after F4 (not pushed; list and
+  test order in [NEXT_SESSION.md](NEXT_SESSION.md)): the engine ported from desktop
+  `develop` `9a8e088` (screen model, languages, catalog, settings, booking flow, run
+  clock and rounds) with 152 JVM tests, and the Android product (driver device, stored
+  settings, history, foreground run service, exact daily alarm, home screen). The
+  Android code compiles against the Android 15 framework jar; no APK of it was built
+  and nothing of it ran on a device.
 - Current development target: MuMu emulator. Physical-phone validation is later.
 - The sibling lab proved Android-controlled UI read/tap on MuMu. The only
   documented real booking used Python on the host.
@@ -54,10 +60,11 @@ Last updated: 2026-10-30. Read with [context](CONTEXT.md) and
 | F2a — One-APK proof | `claude/modest-einstein-8rwk32` from `develop` (`3a3baca`), a session-generated name instead of `spike/vcourt-one-apk` | Code at `5d44964`, merged into `develop` through [PR #7](https://github.com/servedbyhau/v-court/pull/7) at `333f2cd`; the MuMu run is still open. | The app APK compiles `android/app`'s driver in and declares it as an Instrumentation targeting `dev.vcourt.mobile`. `ShellService`, a Shizuku user service, runs `am instrument -w --no-restart`; the Android 15 framework (Robolectric `android-all` 15) shows that flag keeps the running process instead of force-stopping the package, at start and at finish. `OneApkProof` checks the free socket, starts the driver, runs `hello`, `current`, `dump`, a `click` on V Court's own test target (and that the tap arrived), `stop`, and that `am` ended and the socket closed. Evidence: the app and driver compile against that jar with `-Xlint:all` and no warning in this repo's code; the 57 engine tests pass; [CI on the pull request](https://github.com/servedbyhau/v-court/actions/runs/41018714495) and [on `develop`](https://github.com/servedbyhau/v-court/actions/runs/41018859919) ran the tests and built and signed both APKs, the V Court one with the driver inside. Nothing has run on a device: whether `am` accepts `--no-restart` there is unproven. |
 | F3 — Owned driver session | `feat/vcourt-driver-session` from `develop` (`734a531`) | Implemented; merge into `develop` after CI is the exit. | `DriverSession`, `DriverLauncher`, `DriverConnector`, `LauncherState`, `DriverUnavailableException` and `DriverInUseException` in `dev.vcourt.engine.driver`, ported from the desktop's `connect_driver` and `stop_driver` with V Court's ownership rule; `ShizukuDriverLauncher` and `LocalSocketConnector` on Android; `OneApkProof` runs on the session. 14 new JVM tests (71 in all) cover refusing a foreign driver, the start poll, a dropped first hello, an early exit, the start timeout, another protocol or version (never stopped), a failed start, an interrupted start, stop and its timeout, cancel, and a stop that cannot reach the driver. App compile check against Android 15 clean. No device run. |
 | F4 — Vinhomes read check | `feat/vcourt-vinhomes-read` stacked on F3 (`8198a50`) | Implemented; merge into `develop` after F3 and CI is the exit. | `VinhomesReadCheck` opens a `DriverSession`, starts Vinhomes Resident (`com.vinhomes.resident`, declared in `<queries>`), waits for it in front, reads it every 0.25 s for up to 30 s until "Tiện ích" or "Utilities" shows (desktop `home` label, exact match), comes back to V Court by an activity start or one Back, taps V Court's test target and stops. Nothing in Vinhomes is tapped; the report holds counts, timings and the label only. `ScreenProbe` and `CheckSupport` are shared with the one-APK proof. App compile check against Android 15 clean; 71 engine tests pass. No device run. |
+| Full build | 14 local branches from `docs/vcourt-full-build-plan` to `docs/vcourt-full-build-status`, stacked on F4 | Coded and committed locally; not pushed. | Engine: `dev.vcourt.engine.screen`, `.booking`, `.events`, `.flow`, `.clock`; 152 JVM tests pass (`-Xlint:all -Werror`), among them 23 flow cases on the desktop's fake app (a full round costs 16 commands, as on the desktop) and 5 run cases. Android: `DriverDevice`, `SettingsStore`/`SettingsActivity`, `HistoryStore`/`HistoryActivity`, `RunService`, `DailySchedule`, `MainActivity`, `DriverChecksActivity`; compile check clean. Not built with the SDK, not run. Known gaps: English-only UI; on a phone the screen and keyguard are not handled yet (MuMu's screen stays on); Shizuku without root stops at reboot. |
 
 ## Next gate
 
-The device evidence for phase A: once F3 and F4 are merged, build the APK on
-the development machine from `develop`, install it on MuMu with Shizuku running
-and follow [SETUP.md](SETUP.md), "Driver checks on MuMu". It completes M1 when the
-reports pass ([NEXT_SESSION.md](NEXT_SESSION.md)). A build does not complete M1.
+Push and merge the stacked branches in order when the user asks, then run the
+device tests in [NEXT_SESSION.md](NEXT_SESSION.md), "Device tests after the build",
+starting with [SETUP.md](SETUP.md), "Driver checks on MuMu". A build does not
+complete M1.
