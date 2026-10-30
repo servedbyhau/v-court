@@ -25,7 +25,8 @@ merges back into `develop`, and a stable milestone is promoted to `main`.
 See [the branch workflow](docs/WORKFLOW.md).
 
 **Desktop reference:** always check the latest `develop` at
-`D:\VH-Booker\vh-tennis-booker` before porting behavior. The lab's inherited
+`D:\VH-Booker\vh-tennis-booker` (GitHub `servedbyhau/vh-tennis-booker`) before
+porting behavior. The lab's inherited
 Python tree is older. See [desktop source map](docs/DESKTOP_REFERENCE.md).
 
 For a fresh machine, follow [Android setup](docs/SETUP.md). The chosen stack
