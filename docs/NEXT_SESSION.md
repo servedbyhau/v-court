@@ -28,7 +28,7 @@ Python is build-time tooling only. V Court feature branches start from its own
 | F2a — One-APK architecture proof | From `develop` (`3a3baca`); merged through PR #7 at `333f2cd` | One APK with app and Instrumentation driver; Shizuku shell service starts it with `--no-restart`; the in-app proof runs hello, safe read/tap and cleanup. CI builds it. | Open: fresh single-APK install on MuMu and two passing proof reports, recorded on a `docs/` branch. |
 | D1 — F2a status and branch names | `docs/vcourt-f2a-status` from `develop` (`333f2cd`) | Status notes say F2a merged with its MuMu run open; AGENTS.md states the branch naming rule. | Docs agree; links checked; merge into `develop`. |
 | F3 — Owned driver session | `feat/vcourt-driver-session` from `develop` (`734a531`) | Implemented. `DriverSession` in the engine: refuses a driver it did not start, starts one through a `DriverLauncher`, waits for `hello` (protocol and version), stops it and ends it if it does not stop, can be cancelled from another thread; Android `DriverLauncher` and `DriverConnector` over `ShellBridge` and `LocalSocket`; the one-APK proof runs on it. | Fake lifecycle tests pass on the JVM; app compile check and CI build pass; merge into `develop`. |
-| F4 — Vinhomes read check | `feat/vcourt-vinhomes-read` stacked on F3 | In-app check: open a session, open Vinhomes Resident, read its screen and report only counts and whether the home tile label shows, return to V Court, tap V Court's test target, stop. | Compile check and CI build pass; merge into `develop` after F3. |
+| F4 — Vinhomes read check | `feat/vcourt-vinhomes-read` stacked on F3 | Implemented. In-app check: open a session, open Vinhomes Resident, read its screen and report only counts and whether the home tile label shows, return to V Court, tap V Court's test target, stop. | Compile check and CI build pass; merge into `develop` after F3. |
 | F2a/F4 device evidence | `test/vcourt-mumu-session` from `develop` after F4 | Run the one-APK proof twice and the Vinhomes read check once on MuMu; record the redacted reports. Completes M1. | Reports pass; no booking submitted. |
 | Two-APK removal | `chore/vcourt-drop-driver-apk` from `develop` after the device evidence | Stop building the separate driver APK in CI and docs once one APK is proven. | CI passes; docs agree. |
 
@@ -63,7 +63,7 @@ so that run is what remains; its result goes on its own branch from `develop`.
 2. Checks, done: engine tests and a compile against an Android 15 framework jar
    in the cloud; CI built and signed the APK on PR #7 and on `develop`.
 3. Device gate, open, on the development machine: install the one APK on MuMu with
-   Shizuku running, run the proof twice ([SETUP.md](SETUP.md), "One-APK proof"),
+   Shizuku running, run the proof twice ([SETUP.md](SETUP.md), "Driver checks on MuMu"),
    and record the redacted report in [PROGRESS.md](PROGRESS.md). No booking.
 4. Then record the package and Instrumentation contract in
    [TECH_STACK.md](TECH_STACK.md) and [CONTEXT.md](CONTEXT.md). If
