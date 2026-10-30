@@ -4,8 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageManager;
-import android.net.LocalSocket;
-import android.net.LocalSocketAddress;
 import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
@@ -22,17 +20,17 @@ import java.util.regex.Pattern;
 
 import dev.vcourt.engine.driver.ClickResult;
 import dev.vcourt.engine.driver.DriverClient;
-import dev.vcourt.engine.driver.DriverException;
-import dev.vcourt.engine.driver.Hello;
-import dev.vcourt.engine.driver.StreamTransport;
+import dev.vcourt.engine.driver.DriverInUseException;
+import dev.vcourt.engine.driver.DriverSession;
+import dev.vcourt.engine.driver.LauncherState;
 import rikka.shizuku.Shizuku;
 
 /**
- * The F2a proof: start the driver inside this APK through Shizuku, then greet it, read
- * V Court's own screen, tap V Court's test target, stop the driver and check it is gone.
+ * The F2a proof: open a {@link DriverSession} on the driver inside this APK, read V Court's
+ * own screen, tap V Court's test target, stop the session and check the driver is gone.
  *
  * <p>Each step reports one line; the report holds no personal data (it reads only V Court's
- * screen), so it can be pasted as evidence. Cleanup runs whatever step failed.
+ * screen), so it can be pasted as evidence. The session is stopped whatever step failed.
  */
 final class OneApkProof implements Runnable {
     /** Receives each line of the report, on the proof's thread. */
@@ -41,10 +39,7 @@ final class OneApkProof implements Runnable {
     }
 
     private static final String TAG = "VCourtProof";
-    private static final long BIND_TIMEOUT_MS = 10_000;
-    private static final long CONNECT_TIMEOUT_MS = 10_000;
     private static final long TAP_TIMEOUT_MS = 2_000;
-    private static final long EXIT_TIMEOUT_MS = 5_000;
     private static final long POLL_MS = 100;
     private static final Pattern BOUNDS = Pattern.compile("\\[(-?\\d+),(-?\\d+)]\\[(-?\\d+),(-?\\d+)]");
 
@@ -60,9 +55,8 @@ final class OneApkProof implements Runnable {
     private final Context context;
     private final IntSupplier taps;
     private final Listener listener;
-    private ShellBridge bridge;
-    private DriverClient client;
-    private boolean stopped;
+    private final LocalSocketConnector connector = new LocalSocketConnector();
+    private DriverSession session;
 
     /** {@code taps} counts the taps V Court's test target received. */
     OneApkProof(Context context, IntSupplier taps, Listener listener) {
@@ -89,7 +83,10 @@ final class OneApkProof implements Runnable {
             report("FAIL " + e);
             report("RESULT: FAIL");
         } finally {
-            cleanUp();
+            if (session != null) {
+                DriverSession.StopReport stopped = session.stop();
+                report("cleanup: " + describe(stopped));
+            }
         }
     }
 
@@ -109,35 +106,16 @@ final class OneApkProof implements Runnable {
         }
         pass("Instrumentation: declared in this APK, targets " + info.targetPackage);
 
-        // Never take over another driver: the separate development APK serves the same name.
-        if (socketAnswers()) {
-            throw new Failure("Socket: another driver already serves " + DriverContract.SOCKET
-                    + "; stop it first");
-        }
-        pass("Socket: " + DriverContract.SOCKET + " free");
-
-        bridge = ShellBridge.bind(BIND_TIMEOUT_MS);
-        pass("Shell service: bound, uid " + bridge.state().uid);
-
-        String error = bridge.startDriver();
-        if (error != null) {
-            throw new Failure("am instrument: " + error);
-        }
-        long started = SystemClock.elapsedRealtime();
-        LocalSocket socket = connectToStartedDriver();
-        client = new DriverClient(new StreamTransport(socket.getInputStream(),
-                socket.getOutputStream(), socket));
-        pass("Driver: serving after " + (SystemClock.elapsedRealtime() - started) + " ms");
-
+        ShizukuDriverLauncher launcher = new ShizukuDriverLauncher();
         long t = SystemClock.elapsedRealtime();
-        Hello hello = client.hello();
-        String ownVersion = context.getPackageManager()
-                .getPackageInfo(DriverContract.PACKAGE, 0).versionName;
-        if (!hello.version().equals(ownVersion)) {
-            throw new Failure("hello: driver " + hello.version() + " is not this APK's "
-                    + ownVersion);
+        try {
+            session = DriverSession.open(launcher, connector, ownVersion());
+        } catch (DriverInUseException e) {
+            throw new Failure("Socket: " + e.getMessage() + "; stop the other driver first");
         }
-        pass("hello: " + hello + ", " + since(t));
+        pass("Driver: started through a shell service (uid " + launcher.serviceUid()
+                + ") and greeted in " + since(t) + ": " + session.hello());
+        DriverClient client = session.client();
 
         t = SystemClock.elapsedRealtime();
         String current = client.currentPackage();
@@ -164,72 +142,56 @@ final class OneApkProof implements Runnable {
             throw new Failure("click: the driver found no target");
         }
         long clickTime = SystemClock.elapsedRealtime() - t;
-        if (!waitFor(() -> taps.getAsInt() > before, TAP_TIMEOUT_MS)) {
+        if (!tapArrived(before)) {
             throw new Failure("click: sent (" + click.how() + ") but the target saw no tap");
         }
         pass("click: " + click.how() + " on " + click.bounds() + ", target saw it, "
                 + clickTime + " ms");
 
-        client.stop();
-        stopped = true;
-        if (!waitFor(() -> !bridge.state().running, EXIT_TIMEOUT_MS)) {
-            throw new Failure("stop: am still runs after " + EXIT_TIMEOUT_MS + " ms");
+        DriverSession.StopReport stopped = session.stop();
+        if (!stopped.clean()) {
+            throw new Failure("stop: " + describe(stopped));
         }
-        ShellBridge.State state = bridge.state();
-        pass("stop: am ended with " + state.exitCode + " (" + lastLine(state.output) + ")");
-        if (socketAnswers()) {
+        pass("stop: " + describe(stopped));
+        session = null;
+        try {
+            connector.connect().close();
             throw new Failure("stop: " + DriverContract.SOCKET + " still answers");
-        }
-        pass("stop: " + DriverContract.SOCKET + " closed; app pid still " + Process.myPid());
-    }
-
-    /** Connect once the driver serves; fail at once if {@code am} ended first. */
-    private LocalSocket connectToStartedDriver() throws Exception {
-        long deadline = SystemClock.elapsedRealtime() + CONNECT_TIMEOUT_MS;
-        while (true) {
-            try {
-                return connect();
-            } catch (IOException notYet) {
-                ShellBridge.State state = bridge.state();
-                if (!state.running) {
-                    throw new Failure("am instrument ended with " + state.exitCode + ": "
-                            + oneLine(state.output));
-                }
-                if (SystemClock.elapsedRealtime() > deadline) {
-                    throw new Failure("Driver: no socket within " + CONNECT_TIMEOUT_MS
-                            + " ms; am says: " + oneLine(state.output));
-                }
-                Thread.sleep(POLL_MS);
-            }
+        } catch (IOException expected) {
+            pass("stop: " + DriverContract.SOCKET + " closed; app pid still " + Process.myPid());
         }
     }
 
-    /** Stop what the proof started, whichever step failed. */
-    private void cleanUp() {
-        if (client != null) {
-            if (!stopped && !client.isBroken()) {
-                try {
-                    client.stop();
-                    stopped = true;
-                    report("cleanup: driver asked to stop");
-                } catch (DriverException e) {
-                    report("cleanup: stop failed: " + e.getMessage());
-                }
+    private String ownVersion() throws PackageManager.NameNotFoundException {
+        return context.getPackageManager().getPackageInfo(DriverContract.PACKAGE, 0).versionName;
+    }
+
+    private boolean tapArrived(int before) throws InterruptedException {
+        long deadline = SystemClock.elapsedRealtime() + TAP_TIMEOUT_MS;
+        while (taps.getAsInt() <= before) {
+            if (SystemClock.elapsedRealtime() > deadline) {
+                return false;
             }
-            client.close();
+            Thread.sleep(POLL_MS);
         }
-        if (bridge != null) {
-            try {
-                if (!waitFor(() -> !bridge.state().running, EXIT_TIMEOUT_MS)) {
-                    bridge.killDriver();
-                    report("cleanup: am killed; restart V Court before the next run");
-                }
-            } catch (Exception e) {
-                report("cleanup: " + e);
-            }
-            bridge.unbind();
-            report("cleanup: shell service unbound");
+        return true;
+    }
+
+    /** Return how a session ended, on one line. */
+    static String describe(DriverSession.StopReport stopped) {
+        LauncherState state = stopped.state();
+        StringBuilder line = new StringBuilder(stopped.asked() ? "driver stopped" : "stop not delivered");
+        if (state != null) {
+            line.append(state.running() ? ", am still runs" : ", am ended with " + state.exitCode())
+                    .append(" (").append(lastLine(state.output())).append(")");
         }
+        if (stopped.killed()) {
+            line.append(", am killed: restart V Court before the next run");
+        }
+        if (stopped.problem() != null) {
+            line.append(", ").append(stopped.problem());
+        }
+        return line.toString();
     }
 
     /** One node count and the test target's place in a dump. */
@@ -264,42 +226,6 @@ final class OneApkProof implements Runnable {
         return target;
     }
 
-    private interface Check {
-        boolean holds() throws Exception;
-    }
-
-    private static boolean waitFor(Check check, long timeoutMillis) throws Exception {
-        long deadline = SystemClock.elapsedRealtime() + timeoutMillis;
-        while (!check.holds()) {
-            if (SystemClock.elapsedRealtime() > deadline) {
-                return false;
-            }
-            Thread.sleep(POLL_MS);
-        }
-        return true;
-    }
-
-    private static LocalSocket connect() throws IOException {
-        LocalSocket socket = new LocalSocket();
-        try {
-            socket.connect(new LocalSocketAddress(DriverContract.SOCKET));
-            return socket;
-        } catch (IOException e) {
-            socket.close();
-            throw e;
-        }
-    }
-
-    /** Tell whether anything serves the driver socket now. */
-    private static boolean socketAnswers() {
-        try {
-            connect().close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
     private static String since(long start) {
         return (SystemClock.elapsedRealtime() - start) + " ms";
     }
@@ -307,11 +233,6 @@ final class OneApkProof implements Runnable {
     private static String lastLine(String output) {
         String trimmed = output.trim();
         return trimmed.isEmpty() ? "no output" : trimmed.substring(trimmed.lastIndexOf('\n') + 1);
-    }
-
-    private static String oneLine(String output) {
-        String trimmed = output.trim();
-        return trimmed.isEmpty() ? "no output" : trimmed.replace('\n', ' ');
     }
 
     private void pass(String line) {
