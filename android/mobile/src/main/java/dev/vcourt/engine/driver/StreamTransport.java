@@ -95,15 +95,25 @@ public final class StreamTransport implements DriverTransport {
         return (String) item;
     }
 
+    /**
+     * Close the connection. The resource goes first: a read blocked on the input wakes only
+     * when the socket ends (an Android {@code LocalSocket} needs its input shut down, which its
+     * connector's resource does), and the peer may never close its end, as the driver inside V
+     * Court does not. The input is not closed here when there is a resource: closing it would
+     * wait for the reader's lock, which a blocked read holds, and the socket's end frees it.
+     * Without a resource the streams alone are closed, the input last.
+     */
     @Override
     public void close() {
         if (closed) {
             return;
         }
         closed = true;
-        quietly(out);
-        quietly(in);
         quietly(resource);
+        quietly(out);
+        if (resource == null) {
+            quietly(in);
+        }
     }
 
     private static void quietly(Closeable closeable) {
